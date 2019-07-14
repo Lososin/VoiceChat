@@ -15,6 +15,12 @@ struct FVoiceChatData
 	FString Meta2 = "";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
+	int ChannelsNum = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
+	int CurrentChannel = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
 	TArray<uint8> Data;
 
 	FVoiceChatData()
@@ -25,6 +31,8 @@ FORCEINLINE FArchive& operator<<(FArchive& Ar, FVoiceChatData& TheStruct)
 {
 	Ar << TheStruct.Meta1;
 	Ar << TheStruct.Meta2;
+	Ar << TheStruct.ChannelsNum;
+	Ar << TheStruct.CurrentChannel;
 	Ar << TheStruct.Data;
 
 	return Ar;

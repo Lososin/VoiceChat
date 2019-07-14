@@ -12,14 +12,14 @@ AVoiceChatClient* UVoiceChatFunctionLibrary::CreateVoiceChatClient() {
 	return NewObject<AVoiceChatClient>();
 }
 
-UVoiceChatServer* UVoiceChatFunctionLibrary::CreateVoiceChatServerWithSettings(FVoiceChatSettings Settings) {
-	auto temp = NewObject<UVoiceChatServer>();
+AVoiceChatServer* UVoiceChatFunctionLibrary::CreateVoiceChatServerWithSettings(FVoiceChatSettings Settings) {
+	auto temp = NewObject<AVoiceChatServer>();
 	temp->ConfigureVoiceChat(Settings);
 	return temp;
 }
 
-UVoiceChatServer* UVoiceChatFunctionLibrary::CreateVoiceChatServer() {
-	return NewObject<UVoiceChatServer>();
+AVoiceChatServer* UVoiceChatFunctionLibrary::CreateVoiceChatServer() {
+	return NewObject<AVoiceChatServer>();
 }
 
 FVoiceChatSettings UVoiceChatFunctionLibrary::GetVoiceChatSettingsFromEngineINI() {
