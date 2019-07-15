@@ -43,6 +43,9 @@ public:
 	TArray<uint8> GetVoiceBufferVoiceChat(bool& isValidBuff);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
+	void SetVoiceBufferVoiceChat(FVoiceChatData Data, FVoiceChatClientInfo ClientInfo);
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
 	bool UDPSendVoiceChat(FVoiceChatData ToSend);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")

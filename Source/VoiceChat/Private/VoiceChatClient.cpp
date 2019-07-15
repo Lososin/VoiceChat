@@ -132,9 +132,10 @@ bool AVoiceChatClient::UDPSendVoiceChat(FVoiceChatData ToSend) {
 
 void AVoiceChatClient::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {
 	FVoiceChatData Data;
-	*ArrayReaderPtr << Data;
+	FVoiceChatClientInfo ClientInfo;
+	*ArrayReaderPtr << Data << ClientInfo;
 
-	BPEvent_UDPDataReceivedVoiceChat(Data, EndPt.Address.ToString(), EndPt.Port);
+	BPEvent_UDPDataReceivedVoiceChat(Data, ClientInfo);
 	UDPReceivedVoiceChat_Client.Broadcast(Data, EndPt.Address.ToString(), EndPt.Port);
 }
 
@@ -191,4 +192,14 @@ void AVoiceChatClient::SetChannelVolumeVoiceChat(const int& Channel, const float
 	}
 
 	UE_LOG(VoiceChatLog, Error, TEXT("Channel %d is not exist (Volume Set)"), &Channel);
+}
+
+void SetVoiceBufferVoiceChat(FVoiceChatData ReceivedData, FVoiceChatClientInfo ClientInfo) {
+	auto VoiceInfo = VoiceChannels[ClientInfo.Channel];
+	if (VoiceInfo.VoiceOver == nullptr) {
+		UE_LOG(VoiceChatLog, Warning, TEXT("Channel %d does not exist (Set Voice Buffer)"), &ClientInfo.channel);
+		return;
+	}
+
+	VoiceInfo.VoiceOver->AddWaveData(ReceivedData.Data);
 }

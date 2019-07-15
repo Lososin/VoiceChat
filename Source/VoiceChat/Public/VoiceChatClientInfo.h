@@ -17,9 +17,15 @@ struct FVoiceChatClientInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
 	int Channel = 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
-	FString Meta = "Meta2";
-
 	FVoiceChatClientInfo()
 	{}
 };
+
+FORCEINLINE FArchive& operator<<(FArchive& Ar, FVoiceChatClientInfo& TheStruct)
+{
+	Ar << TheStruct.ClientIP;
+	Ar << TheStruct.ClientPort;
+	Ar << TheStruct.Channel;
+
+	return Ar;
+}
