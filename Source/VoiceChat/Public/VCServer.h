@@ -58,18 +58,17 @@ protected:
 
 	bool UDPReceiverInit();
 
-	bool RegistrationNewClient(FVoiceChatClientInfo NewClientInfo);
+	bool RegClient(FVoiceChatClientInfo NewClientInfo);
+
+	bool UnregClient(FVoiceChatClientInfo NewClientInfo);
 
 private:
-	TArray<FVoiceChatClientInfo> ClientsInfo;
+	TArray<FVCSender> Senders;
 
-	using FChannelNumber = int;
-	TMap<FChannelNumber, FVoiceChatVoiceInfo> VoiceChannels;
+	int ChannelsNum = 0;
 
 	FSocket* ListenerSocket;
 	FUdpSocketReceiver* UDPReceiver;
-
-	TArray<FVoiceChatServerInfo> Senders;
 
 	bool IsInitialized = false;
 };

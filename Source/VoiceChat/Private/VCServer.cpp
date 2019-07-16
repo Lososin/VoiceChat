@@ -66,14 +66,14 @@ bool AVCServer::UDPReceiverInit() {
 	return true;
 }
 
-bool AVCServer::RegistrationNewClient(FVCSourceInfo NewClientInfo) {
+bool AVCServer::RegisterNewClient(FVCSourceInfo NewClientInfo) {
 	FVCSender NewSender;
 
 	//TODO::Bring this to Server Info Method
 	NewSender.RemoteAddress = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 
 	bool isVal;
-	NewServerInfo.RemoteAddress->SetIp(*NewClientInfo.ClientIP, isVal);
+	NewSender.RemoteAddress->SetIp(*NewClientInfo.ClientIP, isVal);
 	if (!isVal) {
 		UE_LOG(VoiceChatLog, Error, TEXT("IP is not valid (RegNewClient)"));
 		return false;
@@ -89,13 +89,13 @@ bool AVCServer::RegistrationNewClient(FVCSourceInfo NewClientInfo) {
 	}
 
 	int32 BufferSize = Settings.BufferSize;
-	NewServerInfo.SenderSocket->SetReceiveBufferSize(BufferSize, BufferSize);
-	NewServerInfo.SenderSocket->SetSendBufferSize(BufferSize, BufferSize);
+	NewSender.SenderSocket->SetReceiveBufferSize(BufferSize, BufferSize);
+	NewSender.SenderSocket->SetSendBufferSize(BufferSize, BufferSize);
 
 	return true;
 }
 
-bool AVCServer::UDPSend(FVCVoicePacket Packet, FVCSender Sender) {
+bool AVCServer::UDPSend(const FVCVoicePacket& Packet, FVCSender Sender) {
 	if (!IsInitialized) {
 		UE_LOG(VoiceChatLog, Error, TEXT("Voice Server is not Initialized"));
 		return false;
@@ -115,6 +115,10 @@ bool AVCServer::UDPSend(FVCVoicePacket Packet, FVCSender Sender) {
 	return true;
 }
 
+void AVCServer::UDPSendBroadcast(const FVCVoicePacket& Packet) {
+	for ()
+}
+
 void AVCServer::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {
 
 }
@@ -124,10 +128,6 @@ void AVCServer::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 
 	DeinitVoiceChat();
-}
-
-bool AVCServer::RegisterNewChannel(int NewChannel) {
-return false;
 }
 
 void AVCServer::Tick(float DeltaTime) {
