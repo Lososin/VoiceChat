@@ -1,11 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VoiceChatSettings.generated.h"
+#include "VCSettings.generated.h"
 
 USTRUCT(BlueprintType)
-struct FVoiceChatSettings
-{
+struct FVCSettings {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
@@ -23,6 +22,5 @@ struct FVoiceChatSettings
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
 	int SampleRate = 44100;
 
-	FVoiceChatSettings()
-	{}
+	FVCSettings() {}
 };
