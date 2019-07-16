@@ -9,9 +9,9 @@
 
 //TODO: To class with initialization in constructor
 USTRUCT(BlueprintType)
-struct FVCSender {
+class FVCSender {
 	GENERATED_USTRUCT_BODY()
-
+	
     TSharedPtr<FInternetAddr> RemoteAddress;
 
 	FSocket* SenderSocket;

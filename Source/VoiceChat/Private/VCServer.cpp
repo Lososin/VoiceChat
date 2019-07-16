@@ -37,7 +37,8 @@ void AVCServer::Deinit() {
 		ListenerSocket->Close();
 		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(ListenerSocket);
 	}
-
+	
+	ChannelsNum = 0;
 	IsInitialized = false;
 }
 
@@ -45,7 +46,7 @@ bool AVCServer::UDPReceiverInit() {
 	FIPv4Address SrvAddress;
 	FIPv4Address::Parse("0.0.0.0", SrvAddress);
 	FIPv4Endpoint SrvEndpoint(SrvAddress, Settings.ServerPort);
-	int32 BufferSize = 2 * 1024 * 1024;
+	int32 BufferSize = Settings.BufferSize;
 
 	ListenerSocket = FUdpSocketBuilder("LSTN_SRV_SOCK").AsNonBlocking().AsReusable().BoundToEndpoint(Endpoint).WithReceiveBufferSize(BufferSize);
 	if (ListenerSocket == nullptr) {
@@ -62,6 +63,7 @@ bool AVCServer::UDPReceiverInit() {
 
 	UDPReceiver->OnDataReceived().BindUObject(this, &AVoiceChatClient::UDPReceive);
 	UDPReceiver->Start();
+	ChannelsNum++;
 
 	return true;
 }
@@ -102,7 +104,7 @@ bool AVCServer::UDPSend(const FVCVoicePacket& Packet, FVCSender Sender) {
 	}
 
 	FArrayWriter Writer;
-	Writer << DataToSend;
+	Writer << Packet;
 
 	int32 BytesSent = 0;
 	Sender.SenderSocket->SendTo(Writer.GetData(), Writer.Num(), BytesSent, *Sender.RemoteAddress);
@@ -116,7 +118,9 @@ bool AVCServer::UDPSend(const FVCVoicePacket& Packet, FVCSender Sender) {
 }
 
 void AVCServer::UDPSendBroadcast(const FVCVoicePacket& Packet) {
-	for ()
+	for (auto& sndr : Senders) {
+		UDPSend(Packet, sndr);
+	}
 }
 
 void AVCServer::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {

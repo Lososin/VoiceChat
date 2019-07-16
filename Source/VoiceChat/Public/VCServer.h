@@ -4,6 +4,7 @@
 #include "VCSettings.h"
 #include "VCVoicePacket.h"
 #include "VCSender.h"
+#include "VCSourceInfo.h"
 
 #include "VoiceModule.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,20 +31,20 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,Audio")
-	TArray<uint8> GetVoiceBuffer(bool& isValidBuff);
-
-	UFUNCTION(BlueprintCallable, Category = "VoiceChat,Audio")
-	bool RegisterNewChannel(int NewChannel);
+	bool RegisterNewClient(FVCSourceInfo NewClientInfo);
 
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,UDP")
 	bool UDPSend(FVoiceChatData DataToSend, FVoiceChatServerInfo Sender);
 
-	UPROPERTY(BlueprintAssignable, Category = "VoiceChat,UDP")
-	FUDPReceiveDelegate UDPReceiveDelegate;
+	UFUNCTION(BlueprintCallable, Category = "VoiceChat,UDP")
+	void UDPSendBroadcast(FVoiceChatData DataToSend);
+
+	//UPROPERTY(BlueprintAssignable, Category = "VoiceChat,UDP")
+	//FUDPReceiveDelegate UDPReceiveDelegate;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "VoiceChat,UDP")
-	void BPEvent_UDPReceive(const FVoiceChatData& ReceivedData, const FString& IP, const int& port);
+	void BPEvent_UDPReceive(const FVoiceChatData& ReceivedData, const FVCSourceInfo Info);
 
 	UPROPERTY(BlueprintReadOnly)
 	FVCSettings Settings;
@@ -66,6 +67,8 @@ private:
 	TArray<FVCSender> Senders;
 
 	int ChannelsNum = 0;
+
+	TArray<
 
 	FSocket* ListenerSocket;
 	FUdpSocketReceiver* UDPReceiver;
