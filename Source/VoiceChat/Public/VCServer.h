@@ -30,24 +30,17 @@ public:
 	void Deinit();
 
 
-	UFUNCTION(BlueprintCallable, Category = "VoiceChat,Audio")
-	bool RegisterNewClient(FVCSourceInfo NewClientInfo);
-
+	UFUNCTION(BlueprintCallable, Category = "VoiceChat,UDP")
+	bool UDPSend(const FVCVoicePacket& Packet, FVCSender Sender);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,UDP")
-	bool UDPSend(FVoiceChatData DataToSend, FVoiceChatServerInfo Sender);
-
-	UFUNCTION(BlueprintCallable, Category = "VoiceChat,UDP")
-	void UDPSendBroadcast(FVoiceChatData DataToSend);
+	void UDPSendBroadcast(const FVCVoicePacket& Packet);
 
 	//UPROPERTY(BlueprintAssignable, Category = "VoiceChat,UDP")
 	//FUDPReceiveDelegate UDPReceiveDelegate;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "VoiceChat,UDP")
-	void BPEvent_UDPReceive(const FVoiceChatData& ReceivedData, const FVCSourceInfo Info);
-
-	UPROPERTY(BlueprintReadOnly)
-	FVCSettings Settings;
+	void BPEvent_UDPReceive(const FVCVoicePacket& ReceivedData, const FVCSourceInfo SourceInfo);
 
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -59,19 +52,22 @@ protected:
 
 	bool UDPReceiverInit();
 
-	bool RegClient(FVoiceChatClientInfo NewClientInfo);
+	bool IsAlreadyClient(FVCSourceInfo ClientInfo);
 
-	bool UnregClient(FVoiceChatClientInfo NewClientInfo);
+	bool RegClient(FVCSourceInfo ClientInfo);
+
+	bool UnregClient(FVCSender ClientSender);
+
+	int FindClientChannel(FVCSourceInfo ClientInfo);
 
 private:
 	TArray<FVCSender> Senders;
 
 	int ChannelsNum = 0;
 
-	TArray<
-
 	FSocket* ListenerSocket;
 	FUdpSocketReceiver* UDPReceiver;
 
+	FVCSettings Settings;
 	bool IsInitialized = false;
 };
