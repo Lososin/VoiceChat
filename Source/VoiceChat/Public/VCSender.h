@@ -7,9 +7,8 @@
 #include "IPv4Address.h"
 #include "VCSender.generated.h"
 
-//TODO: To class with initialization in constructor
 USTRUCT(BlueprintType)
-class FVCSender {
+struct FVCSender {
 	GENERATED_USTRUCT_BODY()
 	
     TSharedPtr<FInternetAddr> RemoteAddress;
@@ -18,5 +17,5 @@ class FVCSender {
 
 	int Channel = 0;
 
-	int LifeTime = 100'000; //100 secs
+	int LifeTime = 100000; //100 secs
 };
