@@ -132,9 +132,10 @@ bool AVoiceChatClient::UDPSendVoiceChat(FVoiceChatData ToSend) {
 
 void AVoiceChatClient::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {
 	FVoiceChatData Data;
-	*ArrayReaderPtr << Data;
+	FVoiceChatClientInfo ClientInfo;
+	*ArrayReaderPtr << Data << ClientInfo;
 
-	BPEvent_UDPDataReceivedVoiceChat(Data, EndPt.Address.ToString(), EndPt.Port);
+	BPEvent_UDPDataReceivedVoiceChat(Data, ClientInfo);
 	UDPReceivedVoiceChat_Client.Broadcast(Data, EndPt.Address.ToString(), EndPt.Port);
 }
 
@@ -145,17 +146,29 @@ void AVoiceChatClient::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	DeinitVoiceChat();
 }
 
-void AVoiceChatClient::RegisterNewVoiceOver() {
-	UVoiceOver* NewVoice = NewObject<UVoiceOver>();
-	NewVoice->VoiceOverInit(Settings.SampleRate);
-	VoiceOvers.Add(NewVoice);
-	PlayingChannels.Add(UGameplayStatics::SpawnSound2D(GetWorld(), NewVoice->AudioStream, 10.0));
+bool AVoiceChatClient::RegisterNewChannel(int NewChannel) {
+	for (auto& channel : VoiceChannels) {
+		if (channel.Key == NewChannel) {
+			UE_LOG(VoiceChatLog, Error, TEXT("Channel %d already exist"), &channel);
+			return false;
+		}
+	}
+
+	UVoiceOver* NewVoiceOver = NewObject<UVoiceOver>();
+	NewVoiceOver->VoiceOverInit(Settings.SampleRate);
+	UAudioComponent* NewAudio = UGameplayStatics::SpawnSound2D(GetWorld(), NewVoiceOver->AudioStream, 10.0);
+	
+	VoiceChannels.Add(NewChannel, FVoiceChatVoiceInfo(NewVoiceOver, NewAudio));
+	return true;
 }
 
 void AVoiceChatClient::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
-	if (VoiceOvers.Num() > 0) {
+	if (!IsInitialized) 
+		return;
+
+/*	if (VoiceOvers.Num() > 0) {
 		bool isValid = false;
 		auto arr = GetVoiceBufferVoiceChat(isValid);
 
@@ -163,6 +176,7 @@ void AVoiceChatClient::Tick(float DeltaTime) {
 			VoiceOvers[0]->AddWaveData(arr);
 		}
 	}
+	*/
 }
 
 void AVoiceChatClient::SetMicThresholdVoiceChat(const float& Threshold) {
@@ -170,9 +184,22 @@ void AVoiceChatClient::SetMicThresholdVoiceChat(const float& Threshold) {
 }
 
 void AVoiceChatClient::SetChannelVolumeVoiceChat(const int& Channel, const float& Volume) {
-	if (VoiceOvers.Num() < Channel) {
+	for (auto& channel : VoiceChannels) {
+		if (channel.Key == Channel) {
+			channel.Value.AudioComponent->SetVolumeMultiplier(Volume);
+			return;
+		}
+	}
+
+	UE_LOG(VoiceChatLog, Error, TEXT("Channel %d is not exist (Volume Set)"), &Channel);
+}
+
+void SetVoiceBufferVoiceChat(FVoiceChatData ReceivedData, FVoiceChatClientInfo ClientInfo) {
+	auto VoiceInfo = VoiceChannels[ClientInfo.Channel];
+	if (VoiceInfo.VoiceOver == nullptr) {
+		UE_LOG(VoiceChatLog, Warning, TEXT("Channel %d does not exist (Set Voice Buffer)"), &ClientInfo.channel);
 		return;
 	}
 
-	PlayingChannels[Channel]->SetVolumeMultiplier(Volume);
+	VoiceInfo.VoiceOver->AddWaveData(ReceivedData.Data);
 }

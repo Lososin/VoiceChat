@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "VoiceChat.h"
+#include "VoiceChatVoiceInfo.h"
 #include "VoiceChatSettings.h"
 #include "VoiceChatData.h"
 #include "VoiceModule.h"
@@ -9,7 +11,6 @@
 #include "Sockets.h"
 #include "IPv4Address.h"
 #include "Kismet/GameplayStatics.h"
-#include "VoiceOver.h"
 #include "VoiceChatClient.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
@@ -42,10 +43,13 @@ public:
 	TArray<uint8> GetVoiceBufferVoiceChat(bool& isValidBuff);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
+	void SetVoiceBufferVoiceChat(FVoiceChatData Data, FVoiceChatClientInfo ClientInfo);
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
 	bool UDPSendVoiceChat(FVoiceChatData ToSend);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
-	void RegisterNewVoiceOver();
+	bool RegisterNewChannel(int NewChannel);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
 	void SetMicThresholdVoiceChat(const float& Threshold = 0.f);
@@ -77,13 +81,13 @@ private:
 
 	TSharedPtr<IVoiceCapture> VoiceCapture;
 
+	using FChannelNumber = int;
+	TMap<FChannelNumber, FVoiceChatVoiceInfo> VoiceChannels;
+
+	TSharedPtr<FInternetAddr> RemoteAddress;
 	FSocket* ListenerSocket;
 	FSocket* SenderSocket;
-	TArray<UVoiceOver*> VoiceOvers;
-	TArray<UAudioComponent*> PlayingChannels;
-
 	FUdpSocketReceiver* UDPReceiver;
-	TSharedPtr<FInternetAddr> RemoteAddress;
 
 	bool IsInitialized = false;
 };

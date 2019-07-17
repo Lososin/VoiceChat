@@ -21,10 +21,10 @@ public:
 	static AVoiceChatClient* CreateVoiceChatClient();
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
-	static UVoiceChatServer* CreateVoiceChatServerWithSettings(FVoiceChatSettings Settings);
+	static AVoiceChatServer* CreateVoiceChatServerWithSettings(FVoiceChatSettings Settings);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
-	static UVoiceChatServer* CreateVoiceChatServer();
+	static AVoiceChatServer* CreateVoiceChatServer();
 
 	UFUNCTION(BlueprintPure, Category = "VoiceChat")
 	static FVoiceChatSettings GetVoiceChatSettingsFromEngineINI();
