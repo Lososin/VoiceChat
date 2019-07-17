@@ -2,7 +2,6 @@
 
 AVCServer::AVCServer() {
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 void AVCServer::SetSettings(FVCSettings OtherSettings) {
@@ -191,6 +190,7 @@ void AVCServer::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AVCServer::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
-	if (!IsInitialized) 
+	if (!IsInitialized) {
 		return;
+	}
 }

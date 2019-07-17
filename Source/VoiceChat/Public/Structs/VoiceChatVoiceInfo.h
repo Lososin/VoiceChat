@@ -1,12 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VoiceOver.h"
+#include "VCVoiceTrack.h"
 #include "VoiceChatVoiceInfo.generated.h"
 
 USTRUCT(BlueprintType)
-struct FVoiceChatVoiceInfo
-{
+struct FVCVoiceChannel {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")

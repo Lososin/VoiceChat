@@ -1,15 +1,19 @@
-#include "VoiceChatClient.h"
+#include "VCClient.h"
 
-AVoiceChatClient::AVoiceChatClient() {
+AVCClient::AVCClient() {
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void AVoiceChatClient::ConfigureVoiceChat(FVoiceChatSettings OtherSettings) {
-	Settings = OtherSettings;
+void AVCClient::SetSettings(FVCSettings _Settings) {
+	Settings = _Settings;
 }
 
-bool AVoiceChatClient::InitVoiceChat() {
-	DeinitVoiceChat();
+FVCSettings AVCClient::GetSettings() const {
+	return Settings;
+}
+
+bool AVCClient::Init() {
+	Deinit();
 	
 	if (VoiceModuleInit() && UDPListenerInit() && UDPSenderInit()) {
 		UDPReceiver->Start();
@@ -21,7 +25,7 @@ bool AVoiceChatClient::InitVoiceChat() {
 	return false;
 }
 
-bool AVoiceChatClient::VoiceModuleInit() {
+bool AVCClient::VoiceModuleInit() {
 	FVoiceModule& VoiceModule = FVoiceModule::Get();
 
 	if (!VoiceModule.DoesPlatformSupportVoiceCapture()) {
@@ -45,20 +49,22 @@ bool AVoiceChatClient::VoiceModuleInit() {
 	return true;
 }
 
-bool AVoiceChatClient::UDPListenerInit() {
+bool AVCClient::UDPListenerInit() {
 	FIPv4Address Addr;
 	FIPv4Address::Parse(Settings.ServerIP, Addr);
 	FIPv4Endpoint Endpoint(Addr, Settings.ClientPort);
-	int32 BufferSize = 2 * 1024 * 1024;
+	int32 BufferSize = Settings.BufferSize;
 	ListenerSocket = FUdpSocketBuilder("LSTN_CL_SOCK").AsNonBlocking().AsReusable().BoundToEndpoint(Endpoint).WithReceiveBufferSize(BufferSize);
+	//TODO: Check
 	FTimespan ThreadWaitTime = FTimespan::FromMilliseconds(100);
 	UDPReceiver = new FUdpSocketReceiver(ListenerSocket, ThreadWaitTime, TEXT("UDP CLIENT RECEIVER"));
-	UDPReceiver->OnDataReceived().BindUObject(this, &AVoiceChatClient::UDPReceive);
+	//TODO: Check
+	UDPReceiver->OnDataReceived().BindUObject(this, &AVCClient::UDPReceive);
 
 	return true;
 }
 
-bool AVoiceChatClient::UDPSenderInit() {
+bool AVCClient::UDPSenderInit() {
 	RemoteAddress = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 
 	bool isVal;
@@ -77,7 +83,7 @@ bool AVoiceChatClient::UDPSenderInit() {
 	return true;
 }
 
-void AVoiceChatClient::DeinitVoiceChat() {
+void AVCClient::Deinit() {
 	if (SenderSocket) {
 		SenderSocket->Close();
 		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(SenderSocket);
@@ -98,7 +104,7 @@ void AVoiceChatClient::DeinitVoiceChat() {
 }
 
 
-TArray<uint8> AVoiceChatClient::GetVoiceBufferVoiceChat(bool& isValidBuff) {
+TArray<uint8> AVCClient::GetVoiceBuffer(bool& isValidBuff) {
 	uint32 availableSize;
 	isValidBuff = false;
 	uint8 buff[44100];
@@ -110,7 +116,15 @@ TArray<uint8> AVoiceChatClient::GetVoiceBufferVoiceChat(bool& isValidBuff) {
 	return TArray<uint8>(buff, availableSize);
 }
 
-bool AVoiceChatClient::UDPSendVoiceChat(FVoiceChatData ToSend) {
+void AVCClient::SetVoiceBuffer(FVCVoicePacket Packet) {
+	for (auto& ch : VoiceChannels) {
+		if (ch.Channel = Packet.CurrentChannel) {
+			ch.VoiceTrack->AddWaveData(Packet.VoiceData);
+		}
+	}
+}
+
+bool AVCClient::UDPSend(FVCVoicePacket Packet) {
 	if (!IsInitialized) {
 		UE_LOG(VoiceChatLog, Error, TEXT("Voice Client is not Initialized"));
 		return false;
@@ -130,7 +144,7 @@ bool AVoiceChatClient::UDPSendVoiceChat(FVoiceChatData ToSend) {
 	return true;
 }
 
-void AVoiceChatClient::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {
+void AVCClient::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {
 	FVoiceChatData Data;
 	FVoiceChatClientInfo ClientInfo;
 	*ArrayReaderPtr << Data << ClientInfo;
@@ -139,14 +153,14 @@ void AVoiceChatClient::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const F
 	UDPReceivedVoiceChat_Client.Broadcast(Data, EndPt.Address.ToString(), EndPt.Port);
 }
 
-void AVoiceChatClient::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void AVCClient::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
 	DeinitVoiceChat();
 }
 
-bool AVoiceChatClient::RegisterNewChannel(int NewChannel) {
+bool AVCClient::RegisterNewChannel(int NewChannel) {
 	for (auto& channel : VoiceChannels) {
 		if (channel.Key == NewChannel) {
 			UE_LOG(VoiceChatLog, Error, TEXT("Channel %d already exist"), &channel);
@@ -162,7 +176,7 @@ bool AVoiceChatClient::RegisterNewChannel(int NewChannel) {
 	return true;
 }
 
-void AVoiceChatClient::Tick(float DeltaTime) {
+void AVCClient::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
 	if (!IsInitialized) 
@@ -179,11 +193,11 @@ void AVoiceChatClient::Tick(float DeltaTime) {
 	*/
 }
 
-void AVoiceChatClient::SetMicThresholdVoiceChat(const float& Threshold) {
+void AVCClient::SetMicThreshold(const float& Threshold) {
 	UVOIPStatics::SetMicThreshold(Threshold);
 }
 
-void AVoiceChatClient::SetChannelVolumeVoiceChat(const int& Channel, const float& Volume) {
+void AVCClient::SetVolumeLevel(const int& Channel, const float& Volume) {
 	for (auto& channel : VoiceChannels) {
 		if (channel.Key == Channel) {
 			channel.Value.AudioComponent->SetVolumeMultiplier(Volume);
@@ -194,7 +208,8 @@ void AVoiceChatClient::SetChannelVolumeVoiceChat(const int& Channel, const float
 	UE_LOG(VoiceChatLog, Error, TEXT("Channel %d is not exist (Volume Set)"), &Channel);
 }
 
-void SetVoiceBufferVoiceChat(FVoiceChatData ReceivedData, FVoiceChatClientInfo ClientInfo) {
+/*
+void AVCClient::SetVoiceBufferVoiceChat(FVoiceChatData ReceivedData, FVoiceChatClientInfo ClientInfo) {
 	auto VoiceInfo = VoiceChannels[ClientInfo.Channel];
 	if (VoiceInfo.VoiceOver == nullptr) {
 		UE_LOG(VoiceChatLog, Warning, TEXT("Channel %d does not exist (Set Voice Buffer)"), &ClientInfo.channel);
@@ -203,3 +218,4 @@ void SetVoiceBufferVoiceChat(FVoiceChatData ReceivedData, FVoiceChatClientInfo C
 
 	VoiceInfo.VoiceOver->AddWaveData(ReceivedData.Data);
 }
+*/

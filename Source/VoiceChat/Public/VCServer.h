@@ -5,9 +5,6 @@
 #include "VCVoicePacket.h"
 #include "VCSender.h"
 #include "VCSourceInfo.h"
-
-#include "VoiceModule.h"
-#include "Kismet/GameplayStatics.h"
 #include "VCServer.generated.h"
 
 UCLASS(ClassGroup = VoiceChat, Blueprintable)
@@ -15,7 +12,7 @@ class AVCServer : public AActor {
 	GENERATED_BODY()
 
 public:
-	AVoiceChatServer();
+	AVCServer();
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,Initialization")
 	void SetSettings(FVCSettings _Settings);
