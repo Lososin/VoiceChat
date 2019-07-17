@@ -20,7 +20,13 @@ struct FVCSettings {
 	int BufferSize = 1000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
+	int MaxChannels = 40;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
 	int SampleRate = 44100;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
+	int TimeToDisconnect = 100000;
 
 	FVCSettings() {}
 };

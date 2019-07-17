@@ -14,6 +14,8 @@ struct FVCSourceInfo {
 	int Port = 9999;
 
 	FVCSourceInfo() {}
+
+	FVCSourceInfo(FString _IP, int _Port) : IP(_IP), Port(_Port) {}
 };
 
 FORCEINLINE FArchive& operator<<(FArchive& Ar, FVCSourceInfo& TheStruct) {
