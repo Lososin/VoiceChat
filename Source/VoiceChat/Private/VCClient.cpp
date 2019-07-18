@@ -55,10 +55,16 @@ bool AVCClient::UDPListenerInit() {
 	FIPv4Endpoint Endpoint(Addr, Settings.ClientPort);
 	int32 BufferSize = Settings.BufferSize;
 	ListenerSocket = FUdpSocketBuilder("LSTN_CL_SOCK").AsNonBlocking().AsReusable().BoundToEndpoint(Endpoint).WithReceiveBufferSize(BufferSize);
-	//TODO: Check
+	if (ListenerSocket == nullptr) {
+		return false;
+	}
+
 	FTimespan ThreadWaitTime = FTimespan::FromMilliseconds(100);
 	UDPReceiver = new FUdpSocketReceiver(ListenerSocket, ThreadWaitTime, TEXT("UDP CLIENT RECEIVER"));
-	//TODO: Check
+	if (UDPReceiver == nullptr) {
+		return false;
+	}
+
 	UDPReceiver->OnDataReceived().BindUObject(this, &AVCClient::UDPReceive);
 
 	return true;
