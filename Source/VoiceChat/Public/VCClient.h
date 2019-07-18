@@ -56,7 +56,7 @@ public:
 	bool UDPSend(FVCVoicePacket Packet);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
-	bool RegisterNewChannel(int NewChannel);
+	bool RegNewChannel(int NewChannel);
 
 	//UPROPERTY(BlueprintAssignable, Category = "VoiceChat")
 	//FUDPReceivedVoiceChat UDPReceivedVoiceChat_Client;

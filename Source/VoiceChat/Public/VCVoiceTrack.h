@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Sound/SoundWaveProcedural.h"
-#include "VoiceOver.generated.h"
+#include "VCVoiceTrack.generated.h"
 
 UCLASS(ClassGroup = VoiceChat, Blueprintable)
 class UVCVoiceTrack : public UObject {
