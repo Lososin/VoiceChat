@@ -71,28 +71,32 @@ bool AVCClient::UDPListenerInit() {
 }
 
 bool AVCClient::UDPSenderInit() {
-	RemoteAddress = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+	Sender.RemoteAddress = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 
 	bool isVal;
-	RemoteAddress->SetIp(*Settings.ServerIP, isVal);
+	Sender.RemoteAddress->SetIp(*Settings.ServerIP, isVal);
 	if (!isVal) {
 		return false;
 	}
 
-	RemoteAddress->SetPort(Settings.ServerPort);
+	Sender.RemoteAddress->SetPort(Settings.ServerPort);
 
-	SenderSocket = FUdpSocketBuilder("SNDR_CL_SOCK").AsReusable().WithBroadcast();
-	int32 BufferSize = 2 * 1024 * 1024;
-	SenderSocket->SetReceiveBufferSize(BufferSize, BufferSize);
-	SenderSocket->SetSendBufferSize(BufferSize, BufferSize);
+	Sender.SenderSocket = FUdpSocketBuilder("SNDR_CL_SOCK").AsReusable().WithBroadcast();
+	if (Sender.SenderSocket == nullptr) {
+		return false;
+	}
+
+	int32 BufferSize = Settings.BufferSize;
+	Sender.SenderSocket->SetReceiveBufferSize(BufferSize, BufferSize);
+	Sender.SenderSocket->SetSendBufferSize(BufferSize, BufferSize);
 
 	return true;
 }
 
 void AVCClient::Deinit() {
-	if (SenderSocket) {
-		SenderSocket->Close();
-		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(SenderSocket);
+	if (Sender.SenderSocket) {
+		Sender.SenderSocket->Close();
+		ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(Sender.SenderSocket);
 	}
 	
 	delete UDPReceiver;
@@ -111,18 +115,22 @@ void AVCClient::Deinit() {
 
 
 TArray<uint8> AVCClient::GetVoiceBuffer(bool& isValidBuff) {
-	uint32 availableSize;
+	uint32 AvailableSize;
 	isValidBuff = false;
 	uint8 buff[44100];
-	if (VoiceCapture->GetCaptureState(availableSize) == EVoiceCaptureState::Type::Ok) {
-		VoiceCapture->GetVoiceData(buff, 44100, availableSize);
+	if (VoiceCapture->GetCaptureState(AvailableSize) == EVoiceCaptureState::Type::Ok) {
+		VoiceCapture->GetVoiceData(buff, 44100, AvailableSize);
 		isValidBuff = true;
 	}
 
-	return TArray<uint8>(buff, availableSize);
+	return TArray<uint8>(buff, AvailableSize);
 }
 
 void AVCClient::SetVoiceBuffer(FVCVoicePacket Packet) {
+	if (IsNewChannel(Packet.CurrentChannel)) {
+		RegNewChannel(Packet.CurrentChannel);
+	}
+
 	for (auto& ch : VoiceChannels) {
 		if (ch.Channel = Packet.CurrentChannel) {
 			ch.VoiceTrack->AddWaveData(Packet.VoiceData);
@@ -137,10 +145,10 @@ bool AVCClient::UDPSend(FVCVoicePacket Packet) {
 	}
 		
 	FArrayWriter Writer;
-	Writer << ToSend;
+	Writer << Packet;
 
 	int32 BytesSent = 0;
-	SenderSocket->SendTo(Writer.GetData(), Writer.Num(), BytesSent, *RemoteAddress);
+	SenderSocket->SendTo(Writer.GetData(), Writer.Num(), BytesSent, *Sender.RemoteAddress);
 
 	if (BytesSent <= 0) {
 		UE_LOG(VoiceChatLog, Error, TEXT("Socket is valid but the receiver received 0 bytes, make sure it is listening properly!"));
@@ -151,12 +159,10 @@ bool AVCClient::UDPSend(FVCVoicePacket Packet) {
 }
 
 void AVCClient::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {
-	FVoiceChatData Data;
-	FVoiceChatClientInfo ClientInfo;
-	*ArrayReaderPtr << Data << ClientInfo;
+	FVCVoicePacket Packet;
+	*ArrayReaderPtr << Packet;
 
-	BPEvent_UDPDataReceivedVoiceChat(Data, ClientInfo);
-	UDPReceivedVoiceChat_Client.Broadcast(Data, EndPt.Address.ToString(), EndPt.Port);
+	BPEvent_UDPDataReceivedVoiceChat(Packet);
 }
 
 void AVCClient::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -166,19 +172,28 @@ void AVCClient::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	DeinitVoiceChat();
 }
 
-bool AVCClient::RegisterNewChannel(int NewChannel) {
+bool AVCClient::RegNewChannel(int NewChannel) {
 	for (auto& channel : VoiceChannels) {
-		if (channel.Key == NewChannel) {
-			UE_LOG(VoiceChatLog, Error, TEXT("Channel %d already exist"), &channel);
+		if (channel.Channel == NewChannel) {
+			UE_LOG(VoiceChatLog, Error, TEXT("Channel %d already exist"), &NewChannel);
 			return false;
 		}
 	}
 
-	UVoiceOver* NewVoiceOver = NewObject<UVoiceOver>();
-	NewVoiceOver->VoiceOverInit(Settings.SampleRate);
+	NewVoiceTrack = NewObject<UVCVoiceTrack>();
+	if (NewVoiceTrack == nullptr) {
+		//TODO : LOG
+		return false;
+	}
+	NewVoiceTrack->VoiceOverInit(Settings.SampleRate);
+
 	UAudioComponent* NewAudio = UGameplayStatics::SpawnSound2D(GetWorld(), NewVoiceOver->AudioStream, 10.0);
-	
-	VoiceChannels.Add(NewChannel, FVoiceChatVoiceInfo(NewVoiceOver, NewAudio));
+	if (NewAudio == nullptr) {
+		//TODO : LOG
+		return false;
+	}
+
+	VoiceChannels.Add(FVoiceChatVoiceInfo(NewVoiceOver, NewAudio, NewChannel));
 	return true;
 }
 
@@ -187,16 +202,6 @@ void AVCClient::Tick(float DeltaTime) {
 
 	if (!IsInitialized) 
 		return;
-
-/*	if (VoiceOvers.Num() > 0) {
-		bool isValid = false;
-		auto arr = GetVoiceBufferVoiceChat(isValid);
-
-		if (isValid) {
-			VoiceOvers[0]->AddWaveData(arr);
-		}
-	}
-	*/
 }
 
 void AVCClient::SetMicThreshold(const float& Threshold) {
@@ -205,23 +210,11 @@ void AVCClient::SetMicThreshold(const float& Threshold) {
 
 void AVCClient::SetVolumeLevel(const int& Channel, const float& Volume) {
 	for (auto& channel : VoiceChannels) {
-		if (channel.Key == Channel) {
-			channel.Value.AudioComponent->SetVolumeMultiplier(Volume);
+		if (channel.Channel == Channel) {
+			channel.AudioComponent->SetVolumeMultiplier(Volume);
 			return;
 		}
 	}
 
 	UE_LOG(VoiceChatLog, Error, TEXT("Channel %d is not exist (Volume Set)"), &Channel);
 }
-
-/*
-void AVCClient::SetVoiceBufferVoiceChat(FVoiceChatData ReceivedData, FVoiceChatClientInfo ClientInfo) {
-	auto VoiceInfo = VoiceChannels[ClientInfo.Channel];
-	if (VoiceInfo.VoiceOver == nullptr) {
-		UE_LOG(VoiceChatLog, Warning, TEXT("Channel %d does not exist (Set Voice Buffer)"), &ClientInfo.channel);
-		return;
-	}
-
-	VoiceInfo.VoiceOver->AddWaveData(ReceivedData.Data);
-}
-*/

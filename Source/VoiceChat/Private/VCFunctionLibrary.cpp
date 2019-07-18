@@ -1,29 +1,29 @@
 #pragma once
 
-#include "VoiceChatFunctionLibrary.h"
+#include "VCFunctionLibrary.h"
 
-AVoiceChatClient* UVoiceChatFunctionLibrary::CreateVoiceChatClientWithSettings(FVoiceChatSettings Settings) {
-	auto temp = NewObject<AVoiceChatClient>();
+AVCClient* UVCFunctionLibrary::CreateVoiceChatClientWithSettings(FVoiceChatSettings Settings) {
+	auto temp = NewObject<AVCClient>();
 	temp->ConfigureVoiceChat(Settings);
 	return temp;
 }
 
-AVoiceChatClient* UVoiceChatFunctionLibrary::CreateVoiceChatClient() {
-	return NewObject<AVoiceChatClient>();
+AVCClient* UVCFunctionLibrary::CreateVoiceChatClient() {
+	return NewObject<AVCClient>();
 }
 
-AVoiceChatServer* UVoiceChatFunctionLibrary::CreateVoiceChatServerWithSettings(FVoiceChatSettings Settings) {
-	auto temp = NewObject<AVoiceChatServer>();
+AVCServer* UVCFunctionLibrary::CreateVoiceChatServerWithSettings(FVoiceChatSettings Settings) {
+	auto temp = NewObject<AVCServer>();
 	temp->ConfigureVoiceChat(Settings);
 	return temp;
 }
 
-AVoiceChatServer* UVoiceChatFunctionLibrary::CreateVoiceChatServer() {
-	return NewObject<AVoiceChatServer>();
+AVCServer* UVCFunctionLibrary::CreateVoiceChatServer() {
+	return NewObject<AVCServer>();
 }
 
-FVoiceChatSettings UVoiceChatFunctionLibrary::GetVoiceChatSettingsFromEngineINI() {
-	FVoiceChatSettings Settings;
+FVCSettings UVCFunctionLibrary::GetVoiceChatSettingsFromEngineINI() {
+	FVCSettings Settings;
 
 	GConfig->GetInt(TEXT("VoiceChatPlugin"), TEXT("SampleRate"), Settings.SampleRate, GEngineIni);
 	if (Settings.SampleRate == 0)

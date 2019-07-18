@@ -1,13 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VoiceOver.h"
-#include "VoiceChatClient.h"
-#include "VoiceChatServer.h"
-#include "VoiceChatFunctionLibrary.generated.h"
+#include "VCClient.h"
+#include "VCServer.h"
+#include "VCFunctionLibrary.generated.h"
 
 UCLASS(ClassGroup = VoiceChat, Blueprintable)
-class UVoiceChatFunctionLibrary : public UBlueprintFunctionLibrary
+class UVCFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
@@ -15,17 +14,17 @@ class UVoiceChatFunctionLibrary : public UBlueprintFunctionLibrary
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
-	static AVoiceChatClient* CreateVoiceChatClientWithSettings(FVoiceChatSettings Settings);
+	static AVCClient* CreateVoiceChatClientWithSettings(FVCSettings Settings);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
-	static AVoiceChatClient* CreateVoiceChatClient();
+	static AVCClient* CreateVoiceChatClient();
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
-	static AVoiceChatServer* CreateVoiceChatServerWithSettings(FVoiceChatSettings Settings);
+	static AVCServer* CreateVoiceChatServerWithSettings(FVCSettings Settings);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
-	static AVoiceChatServer* CreateVoiceChatServer();
+	static AVCServer* CreateVoiceChatServer();
 
 	UFUNCTION(BlueprintPure, Category = "VoiceChat")
-	static FVoiceChatSettings GetVoiceChatSettingsFromEngineINI();
+	static FVCSettings GetVoiceChatSettingsFromEngineINI();
 };
