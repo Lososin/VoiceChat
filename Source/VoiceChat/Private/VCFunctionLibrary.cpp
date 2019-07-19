@@ -2,9 +2,9 @@
 
 #include "VCFunctionLibrary.h"
 
-AVCClient* UVCFunctionLibrary::CreateVoiceChatClientWithSettings(FVoiceChatSettings Settings) {
+AVCClient* UVCFunctionLibrary::CreateVoiceChatClientWithSettings(FVCSettings Settings) {
 	auto temp = NewObject<AVCClient>();
-	temp->ConfigureVoiceChat(Settings);
+	temp->SetSettings(Settings);
 	return temp;
 }
 
@@ -12,9 +12,9 @@ AVCClient* UVCFunctionLibrary::CreateVoiceChatClient() {
 	return NewObject<AVCClient>();
 }
 
-AVCServer* UVCFunctionLibrary::CreateVoiceChatServerWithSettings(FVoiceChatSettings Settings) {
+AVCServer* UVCFunctionLibrary::CreateVoiceChatServerWithSettings(FVCSettings Settings) {
 	auto temp = NewObject<AVCServer>();
-	temp->ConfigureVoiceChat(Settings);
+	temp->SetSettings(Settings);
 	return temp;
 }
 

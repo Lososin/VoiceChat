@@ -8,16 +8,9 @@
 #include "VCSender.h"
 #include "VCVoiceChannel.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "VoiceModule.h"
 #include "VCClient.generated.h"
-
-/*
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
-	FUDPReceivedVoiceChat,
-	const FVCVoicePacket&, Packet,
-	const FString&, IP,
-	const int&, Port
-);*/
 
 UCLASS(ClassGroup = VoiceChat, Blueprintable)
 class AVCClient : public AActor {
@@ -67,8 +60,13 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void Tick(float DeltaTime) override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
+	USoundWaveProcedural* NewAudioStream2;
 
 protected:
+	virtual void BeginPlay() override;
+
 	void UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt);
 
 	bool VoiceModuleInit();
@@ -84,6 +82,9 @@ private:
 	TSharedPtr<IVoiceCapture> VoiceCapture;
 
 	TArray<FVCVoiceChannel> VoiceChannels;
+
+	TArray<USoundWaveProcedural*> Waves;
+	TArray<UAudioComponent*> Compon;
 
 	FSocket* ListenerSocket;
 	FUdpSocketReceiver* UDPReceiver;

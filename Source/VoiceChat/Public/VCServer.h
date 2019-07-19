@@ -18,7 +18,7 @@ public:
 	void SetSettings(FVCSettings _Settings);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,Initialization")
-	FVCSettings& GetSettings() const;
+	FVCSettings GetSettings() const;
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,Initialization")
 	bool Init();
@@ -28,10 +28,10 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,UDP")
-	bool UDPSend(const FVCVoicePacket& Packet, FVCSender Sender);
+	bool UDPSend(FVCVoicePacket Packet, FVCSender Sender);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,UDP")
-	void UDPSendBroadcast(const FVCVoicePacket& Packet);
+	void UDPSendBroadcast(const FVCVoicePacket& Packet, const FVCSourceInfo SourceInfo);
 
 	//UPROPERTY(BlueprintAssignable, Category = "VoiceChat,UDP")
 	//FUDPReceiveDelegate UDPReceiveDelegate;

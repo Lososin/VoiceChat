@@ -9,7 +9,7 @@ struct FVCVoiceChannel {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
-	UVCVoiceTrack* VoiceTrack = nullptr;
+	USoundWaveProcedural* AudioStream = nullptr;
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
     UAudioComponent* AudioComponent = nullptr;
@@ -21,7 +21,7 @@ struct FVCVoiceChannel {
 
 	FVCVoiceChannel() {}
 
-	FVCVoiceChannel(UVCVoiceTrack* NewVoiceTrack, UAudioComponent* NewAudioComponent, int NewChannel) :
-			VoiceTrack(NewVoiceTrack), AudioComponent(NewAudioComponent), Channel(NewChannel) {
+	FVCVoiceChannel(USoundWaveProcedural* NewAudioStream, UAudioComponent* NewAudioComponent, int NewChannel) :
+			AudioStream(NewAudioStream), AudioComponent(NewAudioComponent), Channel(NewChannel) {
 	}
 };

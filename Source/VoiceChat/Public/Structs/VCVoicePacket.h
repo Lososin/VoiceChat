@@ -22,15 +22,18 @@ struct FVCVoicePacket {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
 	int CurrentChannel = 0;
 
-	FVoiceChatData() {}
+	FVCVoicePacket() {}
+
+	FVCVoicePacket(FString _Meta1, FString _Meta2, TArray<uint8> _VoiceData) : 
+			Meta1(_Meta1), Meta2(_Meta2), VoiceData(_VoiceData) {}
 };
 
-FORCEINLINE FArchive& operator<<(FArchive& Ar, FVoiceChatData& TheStruct) {
-	Ar << TheStruct.Meta1;
-	Ar << TheStruct.Meta2;
-	Ar << TheStruct.Data;
-	Ar << TheStruct.ChannelsNum;
-	Ar << TheStruct.CurrentChannel;
+FORCEINLINE FArchive& operator<<(FArchive& Ar, FVCVoicePacket& Packet) {
+	Ar << Packet.Meta1;
+	Ar << Packet.Meta2;
+	Ar << Packet.VoiceData;
+	Ar << Packet.ChannelsNum;
+	Ar << Packet.CurrentChannel;
 
 	return Ar;
 }

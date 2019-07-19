@@ -4,11 +4,11 @@ AVCServer::AVCServer() {
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void AVCServer::SetSettings(FVCSettings OtherSettings) {
+void AVCServer::SetSettings(FVCSettings _Settings) {
 	Settings = _Settings;
 }
 
-FVCSettings& AVCServer::GetSettings() const {
+FVCSettings AVCServer::GetSettings() const {
 	return Settings;
 }
 
@@ -16,11 +16,6 @@ bool AVCServer::Init() {
 	Deinit();
 
 	if (UDPReceiverInit()) {
-
-		for (int i = 0; i < Settings.MaxChannels; i++) {
-			FreeChannelsPool.Add(i);
-		}
-
 		IsInitialized = true;
 		return true;
 	}
@@ -53,7 +48,7 @@ bool AVCServer::UDPReceiverInit() {
 	FIPv4Endpoint SrvEndpoint(SrvAddress, Settings.ServerPort);
 	int32 BufferSize = Settings.BufferSize;
 
-	ListenerSocket = FUdpSocketBuilder("LSTN_SRV_SOCK").AsNonBlocking().AsReusable().BoundToEndpoint(Endpoint).WithReceiveBufferSize(BufferSize);
+	ListenerSocket = FUdpSocketBuilder("LSTN_SRV_SOCK").AsNonBlocking().AsReusable().BoundToEndpoint(SrvEndpoint).WithReceiveBufferSize(BufferSize);
 	if (ListenerSocket == nullptr) {
 		//TODO: Log
 		return false;
@@ -66,17 +61,16 @@ bool AVCServer::UDPReceiverInit() {
 		return false;
 	}
 
-	UDPReceiver->OnDataReceived().BindUObject(this, &AVoiceChatClient::UDPReceive);
+	UDPReceiver->OnDataReceived().BindUObject(this, &AVCServer::UDPReceive);
 	UDPReceiver->Start();
-	ChannelsNum++;
 
 	return true;
 }
 
 bool AVCServer::IsAlreadyClient(FVCSourceInfo ClientInfo) {
 	for (auto& sndr : Senders) {
-		if (sndr.RemoteAddress.GetIp() == ClientInfo.IP &&
-				sndr.RemoteAddress.GetPort == ClientInfo.Port) {
+		if (//sndr.RemoteAddress->GetIp() == ClientInfo.IP && ================================================================================================
+				sndr.SrcPort == ClientInfo.Port) {
 			return true;
 		}
 	}
@@ -91,7 +85,7 @@ bool AVCServer::RegClient(FVCSourceInfo ClientInfo) {
 	NewSender.RemoteAddress = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 
 	bool isVal;
-	NewSender.RemoteAddress->SetIp(*ClientInfo.ClientIP, isVal);
+	NewSender.RemoteAddress->SetIp(*ClientInfo.IP, isVal);
 	if (!isVal) {
 		UE_LOG(VoiceChatLog, Error, TEXT("IP is not valid (RegNewClient)"));
 		return false;
@@ -99,7 +93,7 @@ bool AVCServer::RegClient(FVCSourceInfo ClientInfo) {
 
 	NewSender.RemoteAddress->SetPort(Settings.ClientPort);
 
-	FString SocketName = FString::Printf(TEXT("SNDR_SRV_SOCK_IP_%s_PORT_%d"), *NewClientInfo.ClientIP, NewClientInfo.ClientPort);	
+	FString SocketName = FString::Printf(TEXT("SNDR_SRV_SOCK_IP_%s_PORT_%d"), *ClientInfo.IP, ClientInfo.Port);	
 	NewSender.SenderSocket = FUdpSocketBuilder(SocketName).AsReusable().WithBroadcast();
 	if (NewSender.SenderSocket == nullptr) {
 		//TODO: Log
@@ -111,6 +105,7 @@ bool AVCServer::RegClient(FVCSourceInfo ClientInfo) {
 	NewSender.SenderSocket->SetSendBufferSize(BufferSize, BufferSize);
 
 	NewSender.Channel = ChannelsNum;
+	NewSender.SrcPort = ClientInfo.Port;
 	ChannelsNum++;
 
 	Senders.Add(NewSender);
@@ -126,8 +121,8 @@ bool AVCServer::UnregClient(FVCSender ClientSender) {
 
 int AVCServer::FindClientChannel(FVCSourceInfo ClientInfo) {
 	for (auto& sndr : Senders) {
-		if (sndr.RemoteAddress.GetIp() == ClientInfo.IP &&
-				sndr.RemoteAddress.GetPort == ClientInfo.Port) {
+		if (//sndr.RemoteAddress.GetIp() == ClientInfo.IP &&
+				sndr.SrcPort == ClientInfo.Port) {
 			return sndr.Channel;
 		}
 	}
@@ -135,7 +130,7 @@ int AVCServer::FindClientChannel(FVCSourceInfo ClientInfo) {
 	return -1;
 }
 
-bool AVCServer::UDPSend(const FVCVoicePacket& Packet, FVCSender Sender) {
+bool AVCServer::UDPSend(FVCVoicePacket Packet, FVCSender Sender) {
 	if (!IsInitialized) {
 		UE_LOG(VoiceChatLog, Error, TEXT("Voice Server is not Initialized"));
 		return false;
@@ -155,14 +150,17 @@ bool AVCServer::UDPSend(const FVCVoicePacket& Packet, FVCSender Sender) {
 	return true;
 }
 
-void AVCServer::UDPSendBroadcast(const FVCVoicePacket& Packet) {
+void AVCServer::UDPSendBroadcast(const FVCVoicePacket& Packet, const FVCSourceInfo SourceInfo) {
 	for (auto& sndr : Senders) {
-		UDPSend(Packet, sndr);
+		if (sndr.SrcPort != SourceInfo.Port) {
+			UDPSend(Packet, sndr);
+		}
 	}
 }
 
 void AVCServer::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {
-	FVCSourceInfo ClientInfo(FVCSourceInfo(FIPv4Endpoint.GetIp(), FIPv4Address.GetPort());
+	FVCSourceInfo ClientInfo(FVCSourceInfo(EndPt.Address.ToString(), EndPt.Port));
+
 	if (!IsAlreadyClient(ClientInfo)) {
 		//TODO: Added log
 		RegClient(ClientInfo);
@@ -171,20 +169,17 @@ void AVCServer::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4End
 	FVCVoicePacket Packet;
 	*ArrayReaderPtr << Packet;
 	Packet.ChannelsNum = ChannelsNum;
-	Packet.Channel = FindClientChannel(ClientInfo);
+	Packet.CurrentChannel = FindClientChannel(ClientInfo);
+
+	UDPSendBroadcast(Packet, ClientInfo);
 
 	BPEvent_UDPReceive(Packet, ClientInfo);
-
-	if (Packet.Meta1 == "WAVE") {
-		UDPSendBroadcast(Packet);
-	}
 }
 
-void AVCServer::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
+void AVCServer::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	Super::EndPlay(EndPlayReason);
 
-	DeinitVoiceChat();
+	Deinit();
 }
 
 void AVCServer::Tick(float DeltaTime) {

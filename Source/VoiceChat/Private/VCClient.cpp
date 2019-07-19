@@ -44,7 +44,7 @@ bool AVCClient::VoiceModuleInit() {
 	}
 
 	VoiceCapture = VoiceModule.CreateVoiceCapture(TEXT("Default Device"), Settings.SampleRate, 1);
-	UVOIPStatics::SetMicThreshold(0);
+	UVOIPStatics::SetMicThreshold(0.01);
 
 	return true;
 }
@@ -113,7 +113,6 @@ void AVCClient::Deinit() {
 	IsInitialized = false;
 }
 
-
 TArray<uint8> AVCClient::GetVoiceBuffer(bool& isValidBuff) {
 	uint32 AvailableSize;
 	isValidBuff = false;
@@ -127,13 +126,9 @@ TArray<uint8> AVCClient::GetVoiceBuffer(bool& isValidBuff) {
 }
 
 void AVCClient::SetVoiceBuffer(FVCVoicePacket Packet) {
-	if (IsNewChannel(Packet.CurrentChannel)) {
-		RegNewChannel(Packet.CurrentChannel);
-	}
-
 	for (auto& ch : VoiceChannels) {
-		if (ch.Channel = Packet.CurrentChannel) {
-			ch.VoiceTrack->AddWaveData(Packet.VoiceData);
+		if (ch.Channel == Packet.CurrentChannel) {
+			ch.AudioStream->QueueAudio(Packet.VoiceData.GetData(), Packet.VoiceData.Num());
 		}
 	}
 }
@@ -148,7 +143,7 @@ bool AVCClient::UDPSend(FVCVoicePacket Packet) {
 	Writer << Packet;
 
 	int32 BytesSent = 0;
-	SenderSocket->SendTo(Writer.GetData(), Writer.Num(), BytesSent, *Sender.RemoteAddress);
+	Sender.SenderSocket->SendTo(Writer.GetData(), Writer.Num(), BytesSent, *Sender.RemoteAddress);
 
 	if (BytesSent <= 0) {
 		UE_LOG(VoiceChatLog, Error, TEXT("Socket is valid but the receiver received 0 bytes, make sure it is listening properly!"));
@@ -162,46 +157,58 @@ void AVCClient::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4End
 	FVCVoicePacket Packet;
 	*ArrayReaderPtr << Packet;
 
-	BPEvent_UDPDataReceivedVoiceChat(Packet);
+	SetVoiceBuffer(Packet);
+
+	BPEvent_UDPReceive(Packet);
 }
 
 void AVCClient::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	DeinitVoiceChat();
+	Deinit();
 }
 
 bool AVCClient::RegNewChannel(int NewChannel) {
-	for (auto& channel : VoiceChannels) {
-		if (channel.Channel == NewChannel) {
-			UE_LOG(VoiceChatLog, Error, TEXT("Channel %d already exist"), &NewChannel);
-			return false;
-		}
-	}
-
-	NewVoiceTrack = NewObject<UVCVoiceTrack>();
-	if (NewVoiceTrack == nullptr) {
+	USoundWaveProcedural* NewAudioStream = NewObject<USoundWaveProcedural>();
+	if (NewAudioStream == nullptr) {
 		//TODO : LOG
 		return false;
 	}
-	NewVoiceTrack->VoiceOverInit(Settings.SampleRate);
+	
+	NewAudioStream->SetSampleRate(Settings.SampleRate);
+	NewAudioStream->SoundGroup = SOUNDGROUP_Voice;
+	NewAudioStream->bLooping = false;
+	NewAudioStream->NumChannels = 1;
 
-	UAudioComponent* NewAudio = UGameplayStatics::SpawnSound2D(GetWorld(), NewVoiceOver->AudioStream, 10.0);
+	UAudioComponent* NewAudio = UGameplayStatics::SpawnSound2D(GetWorld(), NewAudioStream, 10.f);
 	if (NewAudio == nullptr) {
 		//TODO : LOG
 		return false;
 	}
 
-	VoiceChannels.Add(FVoiceChatVoiceInfo(NewVoiceOver, NewAudio, NewChannel));
+	VoiceChannels.Push(FVCVoiceChannel(NewAudioStream, NewAudio, NewChannel));
+
 	return true;
 }
 
 void AVCClient::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
-	if (!IsInitialized) 
+	if (!IsInitialized) {
 		return;
+	}
+
+	bool IsValid = false;
+	auto buff = GetVoiceBuffer(IsValid);
+
+	if (!IsValid) {
+		return;
+	}
+
+	FVCVoicePacket Packet("HUI", "PIZDA", buff);
+
+	UDPSend(Packet);
 }
 
 void AVCClient::SetMicThreshold(const float& Threshold) {
@@ -217,4 +224,23 @@ void AVCClient::SetVolumeLevel(const int& Channel, const float& Volume) {
 	}
 
 	UE_LOG(VoiceChatLog, Error, TEXT("Channel %d is not exist (Volume Set)"), &Channel);
+}
+
+bool AVCClient::IsNewChannel(int Channel) {
+	for (auto& ch : VoiceChannels) {
+		if (ch.Channel == Channel) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void AVCClient::BeginPlay() {
+	Super::BeginPlay();
+
+	for (int i = 0; i < 50; i++) {
+		RegNewChannel(i);
+		//TODO : Dynamic Creation Channels (Just in Game Thread)
+	}
 }

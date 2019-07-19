@@ -15,6 +15,8 @@ struct FVCSender {
 
 	FSocket* SenderSocket;
 
+	int SrcPort = 0;
+
 	int Channel = 0;
 
 	int LifeTime = 100000; //100 secs
