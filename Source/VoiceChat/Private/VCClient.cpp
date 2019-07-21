@@ -138,6 +138,8 @@ bool AVCClient::UDPSend(FVCVoicePacket Packet) {
 		UE_LOG(VoiceChatLog, Error, TEXT("Voice Client is not Initialized"));
 		return false;
 	}
+
+	Packet.CurrentChannel = -1;
 		
 	FArrayWriter Writer;
 	Writer << Packet;
@@ -239,7 +241,7 @@ bool AVCClient::IsNewChannel(int Channel) {
 void AVCClient::BeginPlay() {
 	Super::BeginPlay();
 
-	for (int i = 0; i < 50; i++) {
+	for (int i = 0; i < 20; i++) {
 		RegNewChannel(i);
 		//TODO : Dynamic Creation Channels (Just in Game Thread)
 	}
