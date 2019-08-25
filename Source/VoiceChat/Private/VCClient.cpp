@@ -51,7 +51,7 @@ bool AVCClient::VoiceModuleInit() {
 
 bool AVCClient::UDPListenerInit() {
 	FIPv4Address Addr;
-	FIPv4Address::Parse(Settings.ServerIP, Addr);
+	FIPv4Address::Parse("0.0.0.0", Addr);
 	FIPv4Endpoint Endpoint(Addr, Settings.ClientPort);
 	int32 BufferSize = Settings.BufferSize;
 	ListenerSocket = FUdpSocketBuilder("LSTN_CL_SOCK").AsNonBlocking().AsReusable().BoundToEndpoint(Endpoint).WithReceiveBufferSize(BufferSize);
@@ -156,6 +156,10 @@ bool AVCClient::UDPSend(FVCVoicePacket Packet) {
 }
 
 void AVCClient::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {
+	if (EndPt.Address.ToString() != Settings.ServerIP) {
+		return;
+	}
+
 	FVCVoicePacket Packet;
 	*ArrayReaderPtr << Packet;
 
