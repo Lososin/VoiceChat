@@ -1,8 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "VCSender.h"
 #include "VCClient.h"
 #include "VCServer.h"
+#include "VCSourceInfo.h"
 #include "VCFunctionLibrary.generated.h"
 
 UCLASS(ClassGroup = VoiceChat, Blueprintable)
@@ -12,7 +14,6 @@ class UVCFunctionLibrary : public UBlueprintFunctionLibrary
 
 
 public:
-
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat")
 	static AVCClient* CreateVoiceChatClientWithSettings(FVCSettings Settings);
 

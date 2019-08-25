@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "VCSourceInfo.h"
+#include "VCSender.h"
 #include "VC_ChannelAssigner.generated.h"
 
 // enum class VC_ConnectionProtocolStagesClient : int {
@@ -20,9 +21,6 @@ class UVC_ChannelAssigner : public UObject {
 public:
 	UVC_ChannelAssigner();
 
-	int GetChannel(FVCSourceInfo SourceInfo);
-
 private:
-	TArray<FVCSourceInfo> Channels;
-	int AllChannels = 0;
+
 };

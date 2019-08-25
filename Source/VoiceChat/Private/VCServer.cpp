@@ -81,7 +81,6 @@ bool AVCServer::IsAlreadyClient(FVCSourceInfo ClientInfo) {
 bool AVCServer::RegClient(FVCSourceInfo ClientInfo) {
 	FVCSender NewSender;
 
-	//TODO::Bring this to Server Info Method
 	NewSender.RemoteAddress = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 
 	bool isVal;

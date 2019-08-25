@@ -5,6 +5,7 @@
 #include "SocketSubsystem.h"
 #include "Sockets.h"
 #include "IPv4Address.h"
+#include "VCSourceInfo.h"
 #include "VCSender.generated.h"
 
 USTRUCT(BlueprintType)
@@ -15,7 +16,7 @@ struct FVCSender {
 
 	FSocket* SenderSocket;
 
-	int SrcPort = 0;
+	FVCSourceInfo SourceInfo;
 
 	int Channel = 0;
 

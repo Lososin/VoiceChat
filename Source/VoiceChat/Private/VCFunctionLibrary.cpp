@@ -6,21 +6,21 @@ AVCClient* UVCFunctionLibrary::CreateVoiceChatClientWithSettings(FVCSettings Set
 	auto temp = NewObject<AVCClient>();
 	temp->SetSettings(Settings);
 	return temp;
-}
+};
 
 AVCClient* UVCFunctionLibrary::CreateVoiceChatClient() {
 	return NewObject<AVCClient>();
-}
+};
 
 AVCServer* UVCFunctionLibrary::CreateVoiceChatServerWithSettings(FVCSettings Settings) {
 	auto temp = NewObject<AVCServer>();
 	temp->SetSettings(Settings);
 	return temp;
-}
+};
 
 AVCServer* UVCFunctionLibrary::CreateVoiceChatServer() {
 	return NewObject<AVCServer>();
-}
+};
 
 FVCSettings UVCFunctionLibrary::GetVoiceChatSettingsFromEngineINI() {
 	FVCSettings Settings;
@@ -50,4 +50,4 @@ FVCSettings UVCFunctionLibrary::GetVoiceChatSettingsFromEngineINI() {
 	Settings.ServerIP = ip.ToString();
 
 	return Settings;
-}
+};

@@ -15,7 +15,7 @@ class UVC_ProtocolSwaper : public UObject {
 	GENERATED_BODY()
 
 public:
-	VC_ProtocolSwaper();
+	UVC_ProtocolSwaper();
 
 	ProtocolName GetProtocolName(FVCVoicePacket Packet);
 };
