@@ -1,10 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VCSourceInfo.generated.h"
+#include "VC_EndpointInfo.generated.h"
 
 USTRUCT(BlueprintType)
-struct FVCSourceInfo {
+struct FVC_EndpointInfo {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
@@ -13,12 +13,12 @@ struct FVCSourceInfo {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
 	int Port = 9999;
 
-	FVCSourceInfo() {}
+	FVC_EndpointInfo() {}
 
-	FVCSourceInfo(FString _IP, int _Port) : IP(_IP), Port(_Port) {}
+	FVC_EndpointInfo(FString _IP, int _Port) : IP(_IP), Port(_Port) {}
 };
 
-FORCEINLINE FArchive& operator<<(FArchive& Ar, FVCSourceInfo& TheStruct) {
+FORCEINLINE FArchive& operator<<(FArchive& Ar, FVC_EndpointInfo& TheStruct) {
 	Ar << TheStruct.IP;
 	Ar << TheStruct.Port;
 

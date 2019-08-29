@@ -13,5 +13,5 @@ class UVC_VoiceBroadcast : public UObject {
 public:
 	UVC_VoiceBroadcast();
 
-	static void VoiceBroadcast(FVCVoicePacket Packet, FVCSourceInfo SrcInfo, const UVC_ChannelsManager& Manager);
+	static void VoiceBroadcast(FVCVoicePacket Packet, const UVC_ChannelsManager& Manager);
 };

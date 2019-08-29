@@ -17,8 +17,6 @@ struct FVCVoiceChannel {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
 	int Channel = 0;
 
-	int LifeTime = 100000;
-
 	FVCVoiceChannel() {}
 
 	FVCVoiceChannel(USoundWaveProcedural* NewAudioStream, UAudioComponent* NewAudioComponent, int NewChannel) :

@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "VCSourceInfo.h"
 #include "VCSettings.h"
-#include "VCSender.h"
+#include "VC_Sender.h"
 #include "VC_ChannelsManager.generated.h"
 
 
@@ -16,16 +16,18 @@ public:
 
 	int GetChannelNum(FVCSourceInfo SourceInfo);
 
-	// TODO: to (ipsrc, portsrc, ipdst, portdst, buffsize = default);
-	bool CreateNewChannel(FVCSourceInfo DstAddress, FVCSettings Settings);
+	bool CreateNewSender(FString IpSrc, int PortSrc, FString IpDst, int PortDst, int BufferSize);
 
 	void AssignNewChannelNumber(FVCSender* Sender);
 
-	// TODO: to static
-	TArray<FVCSender>& GetAllSenders();
+	TArray<FVCSender>& GetAllSenders() const;
+
+	FVCSender& GetSender(int Channel) const;
 
 	// TODO: delete channel feature
 private:
-	TArray<FVCSender> Channels;
-	int AllChannels = 0;
+	TArray<FVCSender> Senders;
+	int SendersNum = 0;
 };
+
+// Wrong Name - this is not "Channels Manager", it's something like SendersManager or otherwise like this

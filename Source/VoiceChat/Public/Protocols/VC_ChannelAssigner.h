@@ -5,14 +5,14 @@
 #include "VCSender.h"
 #include "VC_ChannelAssigner.generated.h"
 
-// enum class VC_ConnectionProtocolStagesClient : int {
-// 	IDLE = 0,
-// 	SEND_REQUEST,
-// 	AWAIT_CHANNEL,
-// 	CHANNEL_ASSIGN,
-// 	BREAK_CONNECTION,
-// 	ERROR,
-// };
+enum class VC_ConnectionProtocolStagesClient : int {
+	IDLE = 0,
+	SEND_REQUEST,
+	AWAIT_CHANNEL,
+	CHANNEL_ASSIGN,
+	BREAK_CONNECTION,
+	ERROR,
+};
 
 UCLASS(ClassGroup = VoiceChat, Blueprintable)
 class UVC_ChannelAssigner : public UObject {
@@ -22,5 +22,5 @@ public:
 	UVC_ChannelAssigner();
 
 private:
-
+	VC_ConnectionProtocolStagesClient CurrentStage = IDLE;
 };
