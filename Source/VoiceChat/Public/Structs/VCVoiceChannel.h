@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "VCVoiceTrack.h"
-#include "VCVoiceChannel.generated.h"
+#include "VC_VoiceChannel.generated.h"
 
 USTRUCT(BlueprintType)
 struct FVCVoiceChannel {

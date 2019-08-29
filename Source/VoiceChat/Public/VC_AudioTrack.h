@@ -2,22 +2,23 @@
 
 #include "CoreMinimal.h"
 #include "Sound/SoundWaveProcedural.h"
-#include "VCVoiceTrack.generated.h"
+#include "VC_AudioTrack.generated.h"
 
 UCLASS(ClassGroup = VoiceChat, Blueprintable)
-class UVCVoiceTrack : public UObject {
+class UVC_AudioTrack : public UObject {
 	GENERATED_BODY()
 
 public:
-	UVCVoiceTrack();
-	~UVCVoiceTrack();
+	UVC_AudioTrack();
+	~UVC_AudioTrack();
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,VoiceTrack")
-	void Init(int SampleRate);
+	void Init(int Channel, int SampleRate);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,VoiceTrack")
 	void AddWaveData(TArray<uint8> Data);
 
-	UPROPERTY(BlueprintReadOnly)
-	USoundWaveProcedural* AudioStream;
+private:
+	TUniquePtr<USoundWaveProcedural> AudioStream;
+	int AudioChannel = -1;
 };

@@ -13,15 +13,41 @@ struct FVC_Sender {
 	GENERATED_USTRUCT_BODY()
 	
     TSharedPtr<FInternetAddr> RemoteAddress;
-
-	FSocket* SenderSocket;
+	TUniquePtr<TFSocket> SenderSocket;
 
 	FVC_EndpointInfo SourceInfo;
 
 	int Channel = 0;
 
-	bool Init() {
+	bool Init(FString IpSrc, int PortSrc, FString IpDst, int PortDst, int BufferSize) {
+		RemoteAddress = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
 
+		bool isVal;
+		RemoteAddress->SetIp(*IpDst, isVal);
+		if (!isVal) {
+			UE_LOG(VoiceChatLog, Error, TEXT("IP is not valid (Sender Init)"));
+			return false;
+		}
+
+		RemoteAddress->SetPort(PortDst);
+
+		FString SocketName = FString::Printf(TEXT("SNDR_SRV_SOCK_IP_%s_PORT_%d"), *IpSrc, PortSrc);	
+		SenderSocket = FUdpSocketBuilder(SocketName).AsReusable().WithBroadcast();
+		if (SenderSocket == nullptr) {
+			UE_LOG(VoiceChatLog, Error, TEXT("Sender Socket doesn't created (Sender Init)"));
+			return false;
+		}
+
+		SenderSocket->SetReceiveBufferSize(BufferSize, BufferSize);
+		SenderSocket->SetSendBufferSize(BufferSize, BufferSize);
+
+		SourceInfo = SourceInfo(IpSrc, PortSrc);
+
+		return true;
+	};
+
+	void SetChannel(int _Channel) {
+		Channel = _Channel;
 	};
 
 	bool SendPacket(FVC_Packet& Packet) {
@@ -37,5 +63,9 @@ struct FVC_Sender {
 		}
 
 		return true;
+	};
+
+	~FVC_Sender() {
+		SenderSocket->Close();
 	};
 };

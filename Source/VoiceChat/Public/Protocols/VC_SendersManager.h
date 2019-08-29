@@ -1,28 +1,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VCSourceInfo.h"
-#include "VCSettings.h"
+#include "VC_Address.h"
+#include "VC_Packet.h"
+#include "VC_Settings.h"
 #include "VC_Sender.h"
-#include "VC_ChannelsManager.generated.h"
+#include "VC_SendersManager.generated.h"
 
 
 UCLASS(ClassGroup = VoiceChat, Blueprintable)
-class UVC_ChannelsManager : public UObject {
+class UVC_SendersManager : public UObject {
 	GENERATED_BODY()
 
 public:
-	UVC_ChannelsManager();
+	UVC_SendersManager();
 
-	int GetChannelNum(FVCSourceInfo SourceInfo);
+	int GetChannelNum(FVC_Address SourceInfo);
 
 	bool CreateNewSender(FString IpSrc, int PortSrc, FString IpDst, int PortDst, int BufferSize);
 
-	void AssignNewChannelNumber(FVCSender* Sender);
+	bool SendData(FVC_Packet Packet, int Channel);
 
-	TArray<FVCSender>& GetAllSenders() const;
-
-	FVCSender& GetSender(int Channel) const;
+	TArray<int> GetChannelsArray() const;
 
 	// TODO: delete channel feature
 private:

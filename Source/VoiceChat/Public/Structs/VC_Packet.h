@@ -14,7 +14,7 @@ struct FVC_Packet {
 	TArray<uint8> VoiceData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
-	int Channel = 0;
+	int Channel = -1;
 
 	FVC_Packet() {}
 

@@ -13,5 +13,10 @@ class UVC_VoiceBroadcast : public UObject {
 public:
 	UVC_VoiceBroadcast();
 
+	void SetSendersManager(TSharedPtr<UVC_SendersManager> Manager);
+
 	static void VoiceBroadcast(FVCVoicePacket Packet, const UVC_ChannelsManager& Manager);
+
+private:
+	TSharedPtr<UVC_SendersManager> SendersManager;
 };

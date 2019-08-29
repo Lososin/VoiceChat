@@ -1,14 +1,14 @@
 #pragma once
 
-#include "VCVoiceTrack.h"
+#include "VC_AudioTrack.h"
 
-UVCVoiceTrack::UVCVoiceTrack() {
+UVC_AudioTrack::UVC_AudioTrack() {
 }
 
-UVCVoiceTrack::~UVCVoiceTrack() {
+UVC_AudioTrack::~UVC_AudioTrack() {
 }
 
-void UVCVoiceTrack::Init(int SampleRate) {
+void UVC_AudioTrack::Init(int SampleRate) {
 	if (AudioStream != nullptr) {
 		delete AudioStream;
 	}
@@ -26,7 +26,7 @@ void UVCVoiceTrack::Init(int SampleRate) {
 	AudioStream->NumChannels = 1;
 }
 
-void UVCVoiceTrack::AddWaveData(TArray<uint8> data) {
+void UVC_AudioTrack::AddWaveData(TArray<uint8> data) {
 	if (AudioStream == nullptr) {
 		UE_LOG(VoiceChatLog, Error, TEXT("Voice Over is not Initialized"));
 		return;

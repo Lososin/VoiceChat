@@ -25,6 +25,8 @@ AVCServer* UVCFunctionLibrary::CreateVoiceChatServer() {
 FVCSettings UVCFunctionLibrary::GetVoiceChatSettingsFromEngineINI() {
 	FVCSettings Settings;
 
+	// TODO: DefaultSettings
+
 	GConfig->GetInt(TEXT("VoiceChatPlugin"), TEXT("SampleRate"), Settings.SampleRate, GEngineIni);
 	if (Settings.SampleRate == 0)
 		UE_LOG(VoiceChatLog, Warning, TEXT("SampleRate not found (DefaultEngine.ini)"));

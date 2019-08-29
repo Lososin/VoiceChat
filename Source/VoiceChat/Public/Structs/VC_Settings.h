@@ -1,10 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VCSettings.generated.h"
+#include "VC_Settings.generated.h"
 
 USTRUCT(BlueprintType)
-struct FVCSettings {
+struct FVC_Settings {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
@@ -28,5 +28,5 @@ struct FVCSettings {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VoiceChat")
 	int TimeToDisconnect = 100000;
 
-	FVCSettings() {}
+	FVC_Settings() {}
 };
