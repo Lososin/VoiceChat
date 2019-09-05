@@ -17,16 +17,18 @@ public:
 
 	int GetChannelNum(FVC_Address SourceInfo);
 
-	bool CreateNewSender(FString IpSrc, int PortSrc, FString IpDst, int PortDst, int BufferSize);
+	bool CreateNewSender(FVC_Address ClientSrcAddress, FVC_Settings Settings);
 
-	bool SendData(FVC_Packet Packet, int Channel);
+	bool SendData(FVC_Packet Packet, int Channel) {
+		return 0;
+	};
 
-	TArray<int> GetChannelsArray() const;
+	TArray<int> GetChannelsArray() const {
+		return TArray<int>();
+	};
 
 	// TODO: delete channel feature
 private:
-	TArray<FVCSender> Senders;
+	//TArray<FVC_Sender> Senders; // TODO: To unique ptrs array
 	int SendersNum = 0;
 };
-
-// Wrong Name - this is not "Channels Manager", it's something like SendersManager or otherwise like this

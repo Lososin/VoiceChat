@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VCVoicePacket.h"
+#include "VC_Packet.h"
 #include "VC_ProtocolSwaper.generated.h"
 
 enum class ProtocolName : int {
@@ -17,5 +17,5 @@ class UVC_ProtocolSwaper : public UObject {
 public:
 	UVC_ProtocolSwaper();
 
-	ProtocolName GetProtocolName(FVCVoicePacket Packet);
+	ProtocolName GetProtocolName(FVC_Packet Packet);
 };

@@ -1,11 +1,11 @@
 #include "VC_ProtocolSwaper.h"
 
-UVC_ProtocolSwapper::UVC_ProtocolSwapper() {
+UVC_ProtocolSwaper::UVC_ProtocolSwaper() {
 
 };
 
-ProtocolName UVC_ProtocolSwapper::GetProtocol(FVCVoicePacket Packet) {
-    if (Packet.CurrentChannel == -1) {
+ProtocolName UVC_ProtocolSwaper::GetProtocolName(FVC_Packet Packet) {
+    if (Packet.Channel == -1) {
         return ProtocolName::CHANNEL_ASSIGNER;
     } else {
         return ProtocolName::VOICE_BROADCAST;

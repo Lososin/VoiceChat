@@ -1,55 +1,55 @@
-#pragma once
+// #pragma once
 
-#include "VCFunctionLibrary.h"
+// #include "VCFunctionLibrary.h"
 
-AVCClient* UVCFunctionLibrary::CreateVoiceChatClientWithSettings(FVCSettings Settings) {
-	auto temp = NewObject<AVCClient>();
-	temp->SetSettings(Settings);
-	return temp;
-};
+// AVCClient* UVCFunctionLibrary::CreateVoiceChatClientWithSettings(FVCSettings Settings) {
+// 	auto temp = NewObject<AVCClient>();
+// 	temp->SetSettings(Settings);
+// 	return temp;
+// };
 
-AVCClient* UVCFunctionLibrary::CreateVoiceChatClient() {
-	return NewObject<AVCClient>();
-};
+// AVCClient* UVCFunctionLibrary::CreateVoiceChatClient() {
+// 	return NewObject<AVCClient>();
+// };
 
-AVCServer* UVCFunctionLibrary::CreateVoiceChatServerWithSettings(FVCSettings Settings) {
-	auto temp = NewObject<AVCServer>();
-	temp->SetSettings(Settings);
-	return temp;
-};
+// AVCServer* UVCFunctionLibrary::CreateVoiceChatServerWithSettings(FVCSettings Settings) {
+// 	auto temp = NewObject<AVCServer>();
+// 	temp->SetSettings(Settings);
+// 	return temp;
+// };
 
-AVCServer* UVCFunctionLibrary::CreateVoiceChatServer() {
-	return NewObject<AVCServer>();
-};
+// AVCServer* UVCFunctionLibrary::CreateVoiceChatServer() {
+// 	return NewObject<AVCServer>();
+// };
 
-FVCSettings UVCFunctionLibrary::GetVoiceChatSettingsFromEngineINI() {
-	FVCSettings Settings;
+// FVCSettings UVCFunctionLibrary::GetVoiceChatSettingsFromEngineINI() {
+// 	FVCSettings Settings;
 
-	// TODO: DefaultSettings
+// 	// TODO: DefaultSettings
 
-	GConfig->GetInt(TEXT("VoiceChatPlugin"), TEXT("SampleRate"), Settings.SampleRate, GEngineIni);
-	if (Settings.SampleRate == 0)
-		UE_LOG(VoiceChatLog, Warning, TEXT("SampleRate not found (DefaultEngine.ini)"));
+// 	GConfig->GetInt(TEXT("VoiceChatPlugin"), TEXT("SampleRate"), Settings.SampleRate, GEngineIni);
+// 	if (Settings.SampleRate == 0)
+// 		UE_LOG(VoiceChatLog, Warning, TEXT("SampleRate not found (DefaultEngine.ini)"));
 
-	GConfig->GetInt(TEXT("VoiceChatPlugin"), TEXT("ServerPort"), Settings.ServerPort, GEngineIni);
-	if (Settings.ServerPort == 0)
-		UE_LOG(VoiceChatLog, Warning, TEXT("ServerPort not found (DefaultEngine.ini)"));
+// 	GConfig->GetInt(TEXT("VoiceChatPlugin"), TEXT("ServerPort"), Settings.ServerPort, GEngineIni);
+// 	if (Settings.ServerPort == 0)
+// 		UE_LOG(VoiceChatLog, Warning, TEXT("ServerPort not found (DefaultEngine.ini)"));
 
-	GConfig->GetInt(TEXT("VoiceChatPlugin"), TEXT("ClientPort"), Settings.ClientPort, GEngineIni);
-	if (Settings.ClientPort == 0)
-		UE_LOG(VoiceChatLog, Warning, TEXT("ClientPort not found (DefaultEngine.ini)"));
+// 	GConfig->GetInt(TEXT("VoiceChatPlugin"), TEXT("ClientPort"), Settings.ClientPort, GEngineIni);
+// 	if (Settings.ClientPort == 0)
+// 		UE_LOG(VoiceChatLog, Warning, TEXT("ClientPort not found (DefaultEngine.ini)"));
 
-	GConfig->GetInt(TEXT("VoiceChatPlugin"), TEXT("BufferSize"), Settings.BufferSize, GEngineIni);
-	if (Settings.BufferSize == 0)
-		UE_LOG(VoiceChatLog, Warning, TEXT("BufferSize not found (DefaultEngine.ini)"));
+// 	GConfig->GetInt(TEXT("VoiceChatPlugin"), TEXT("BufferSize"), Settings.BufferSize, GEngineIni);
+// 	if (Settings.BufferSize == 0)
+// 		UE_LOG(VoiceChatLog, Warning, TEXT("BufferSize not found (DefaultEngine.ini)"));
 	
-	FText ip;
-	GConfig->GetText(TEXT("VoiceChatPlugin"), TEXT("ClientPort"), ip, GEngineIni);
-	if (ip.IsEmpty()) {
-		UE_LOG(VoiceChatLog, Warning, TEXT("ServerIP not found (DefaultEngine.ini)"));
-	}
+// 	FText ip;
+// 	GConfig->GetText(TEXT("VoiceChatPlugin"), TEXT("ClientPort"), ip, GEngineIni);
+// 	if (ip.IsEmpty()) {
+// 		UE_LOG(VoiceChatLog, Warning, TEXT("ServerIP not found (DefaultEngine.ini)"));
+// 	}
 
-	Settings.ServerIP = ip.ToString();
+// 	Settings.ServerIP = ip.ToString();
 
-	return Settings;
-};
+// 	return Settings;
+// };

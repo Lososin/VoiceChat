@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VCSourceInfo.h"
-#include "VCSender.h"
+#include "VC_Address.h"
+#include "VC_Sender.h"
 #include "VC_ChannelAssigner.generated.h"
 
 enum class VC_ConnectionProtocolStagesClient : int {
@@ -22,5 +22,5 @@ public:
 	UVC_ChannelAssigner();
 
 private:
-	VC_ConnectionProtocolStagesClient CurrentStage = IDLE;
+	VC_ConnectionProtocolStagesClient CurrentStage = VC_ConnectionProtocolStagesClient::IDLE;
 };

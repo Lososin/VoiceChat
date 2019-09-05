@@ -5,17 +5,23 @@
 #include "SocketSubsystem.h"
 #include "Sockets.h"
 #include "IPv4Address.h"
-#include "VCSourceInfo.h"
+#include "VC_Address.h"
+#include "VC_Packet.h"
 #include "VC_Sender.generated.h"
 
-USTRUCT(BlueprintType)
-struct FVC_Sender {
-	GENERATED_USTRUCT_BODY()
+UCLASS(ClassGroup = VoiceChat, Blueprintable)
+class UVC_Sender : public UObject {
+	GENERATED_BODY()
+
+public:
+	UVC_Sender() {
+
+	};
 	
     TSharedPtr<FInternetAddr> RemoteAddress;
-	TUniquePtr<TFSocket> SenderSocket;
+	TUniquePtr<FSocket> SenderSocket;
 
-	FVC_EndpointInfo SourceInfo;
+	FVC_Address SourceInfo;
 
 	int Channel = 0;
 
@@ -32,8 +38,8 @@ struct FVC_Sender {
 		RemoteAddress->SetPort(PortDst);
 
 		FString SocketName = FString::Printf(TEXT("SNDR_SRV_SOCK_IP_%s_PORT_%d"), *IpSrc, PortSrc);	
-		SenderSocket = FUdpSocketBuilder(SocketName).AsReusable().WithBroadcast();
-		if (SenderSocket == nullptr) {
+		SenderSocket.Reset(FUdpSocketBuilder(SocketName).AsReusable().WithBroadcast());
+		if (!SenderSocket.IsValid()) {
 			UE_LOG(VoiceChatLog, Error, TEXT("Sender Socket doesn't created (Sender Init)"));
 			return false;
 		}
@@ -41,7 +47,7 @@ struct FVC_Sender {
 		SenderSocket->SetReceiveBufferSize(BufferSize, BufferSize);
 		SenderSocket->SetSendBufferSize(BufferSize, BufferSize);
 
-		SourceInfo = SourceInfo(IpSrc, PortSrc);
+		SourceInfo = FVC_Address(IpSrc, PortSrc);
 
 		return true;
 	};
@@ -51,6 +57,10 @@ struct FVC_Sender {
 	};
 
 	bool SendPacket(FVC_Packet& Packet) {
+		if (!SenderSocket.IsValid()) {
+			return false;
+		}
+
 		FArrayWriter Writer;
 		Writer << Packet;
 
@@ -65,7 +75,7 @@ struct FVC_Sender {
 		return true;
 	};
 
-	~FVC_Sender() {
+	~UVC_Sender() {
 		SenderSocket->Close();
 	};
 };

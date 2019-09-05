@@ -10,8 +10,11 @@ class UVC_MicrophonManager : public UObject {
 	GENERATED_BODY()
 
 public:
-	UVC_MicrophonManager();
+	UVC_MicrophonManager() {
 
+	};
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
 	bool Init(int SampleRate = 44100) {
 		Deinit();
 
@@ -40,14 +43,15 @@ public:
 
 		VoiceCapture->Start();
 
-		IsInited = false;
+		InitStatus = true;
 		return true;
 	};
 
+	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
     TArray<uint8> GetVoiceBuffer(bool& isValidBuff) {
 		isValidBuff = false;
 		
-		if (!IsInited) {
+		if (!InitStatus) {
 			return TArray<uint8>();
 		}
 
@@ -62,18 +66,22 @@ public:
 		return TArray<uint8>(buff, AvailableSize);
 	};
 
+	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
 	void SetMicVolume(float Volume = 1.f) {
 		
 	};
 
+	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
 	void SetMicThreshold(float Threshold = 0.01f) {
 		UVOIPStatics::SetMicThreshold(Threshold);
 	};
 
+	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
 	bool IsInited() {
 		return InitStatus;
 	};
 
+	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
 	void Deinit() {
 		InitStatus = false;
 		if (VoiceCapture) {

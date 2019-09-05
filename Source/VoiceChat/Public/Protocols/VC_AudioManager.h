@@ -10,15 +10,25 @@ class UVC_AudioManager : public UObject {
 	GENERATED_BODY()
 
 public:
-	UVC_AudioManager();
+	UVC_AudioManager() {
 
-	bool Init();
+    }
 
-    bool CreateNewAudio();
+	bool Init() {
+        return 1;
+    }
 
-    void SetData();
+    bool CreateNewAudio() {
+        return false;
+    }
 
-    void Deinit();
+    void SetData() {
+
+    };
+
+    void Deinit() {
+        
+    }
 
 private:
     TArray<UVC_AudioTrack> VoiceTracks;
