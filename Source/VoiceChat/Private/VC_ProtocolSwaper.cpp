@@ -12,4 +12,4 @@ ProtocolName UVC_ProtocolSwaper::GetProtocolName(FVC_Packet Packet) {
     }
 
     return ProtocolName::NONE;
-}
+};

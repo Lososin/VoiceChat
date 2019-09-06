@@ -37,21 +37,21 @@ public:
 
 		VoiceCapture = VoiceModule.CreateVoiceCapture(TEXT("Default Device"), SampleRate, 1);
 
-		if (!VoiceCapture) {
+		if (!VoiceCapture.IsValid()) {
 			return false;
 		}
 
 		VoiceCapture->Start();
 
 		InitStatus = true;
-		return true;
+		return InitStatus;
 	};
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
     TArray<uint8> GetVoiceBuffer(bool& isValidBuff) {
 		isValidBuff = false;
 		
-		if (!InitStatus) {
+		if (!InitStatus || !VoiceCapture->IsCapturing()) {
 			return TArray<uint8>();
 		}
 
@@ -68,7 +68,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
 	void SetMicVolume(float Volume = 1.f) {
-		
+		TSharedPtr<UAudioComponent> AudioComponent(CreateDefaultSubobject<UAudioComponent>(TEXT("VoiceCaptureComponent")));
+		AudioComponent->PitchMultiplier = 0.85f;
+		AudioComponent->VolumeMultiplier = Volume;
 	};
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
@@ -84,7 +86,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
 	void Deinit() {
 		InitStatus = false;
-		if (VoiceCapture) {
+		if (VoiceCapture.IsValid()) {
 			VoiceCapture->Stop();
 		}
 	};

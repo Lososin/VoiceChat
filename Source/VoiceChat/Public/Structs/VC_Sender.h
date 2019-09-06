@@ -15,7 +15,6 @@ class UVC_Sender : public UObject {
 
 public:
 	UVC_Sender() {
-
 	};
 	
     TSharedPtr<FInternetAddr> RemoteAddress;
@@ -76,6 +75,6 @@ public:
 	};
 
 	~UVC_Sender() {
-		SenderSocket->Close();
+		//SenderSocket->Close();
 	};
 };

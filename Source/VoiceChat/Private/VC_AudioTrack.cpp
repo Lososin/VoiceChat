@@ -8,7 +8,7 @@ UVC_AudioTrack::UVC_AudioTrack() {
 UVC_AudioTrack::~UVC_AudioTrack() {
 };
 
-bool UVC_AudioTrack::Init(int Channel, int SampleRate) {
+bool UVC_AudioTrack::Init(int Channel, int SampleRate, float Volume = 1.f) {
 	AudioStream.Reset(NewObject<USoundWaveProcedural>());
 	AudioStream->SetSampleRate(SampleRate);
 	AudioStream->SoundGroup = SOUNDGROUP_Voice;
@@ -16,9 +16,10 @@ bool UVC_AudioTrack::Init(int Channel, int SampleRate) {
 	AudioStream->NumChannels = 1;
 	AudioChannel = Channel;
 
+	Sound.Reset(UGameplayStatics::SpawnSound2D(GetWorld(), AudioStream.Get(), Volume));
 	// TODO: Errors Handler
 	return true;
-}
+};
 
 void UVC_AudioTrack::AddWaveData(TArray<uint8> AudioData) {
 	if (!AudioStream.IsValid()) {
@@ -27,4 +28,8 @@ void UVC_AudioTrack::AddWaveData(TArray<uint8> AudioData) {
 	}
 
 	AudioStream->QueueAudio(AudioData.GetData(), AudioData.Num());
-}
+};
+
+void UVC_AudioTrack::SetVolume(float Volume = 1.f) {
+	Sound->VolumeMultiplier = Volume;
+};

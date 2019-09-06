@@ -15,20 +15,16 @@ class UVC_SendersManager : public UObject {
 public:
 	UVC_SendersManager();
 
-	int GetChannelNum(FVC_Address SourceInfo);
+	int GetChannelNum(FVC_Address SourceInfo) const;
 
 	bool CreateNewSender(FVC_Address ClientSrcAddress, FVC_Settings Settings);
 
-	bool SendData(FVC_Packet Packet, int Channel) {
-		return 0;
-	};
+	bool SendData(FVC_Packet Packet, int Channel) const;
 
-	TArray<int> GetChannelsArray() const {
-		return TArray<int>();
-	};
+	TArray<int> GetChannelsArray() const;
 
 	// TODO: delete channel feature
-private:
-	//TArray<FVC_Sender> Senders; // TODO: To unique ptrs array
+private: 
+	TArray<TUniquePtr<UVC_Sender>> Senders;
 	int SendersNum = 0;
 };

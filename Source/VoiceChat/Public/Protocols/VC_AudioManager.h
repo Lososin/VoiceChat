@@ -31,6 +31,6 @@ public:
     }
 
 private:
-    TArray<UVC_AudioTrack> VoiceTracks;
+    TArray<UVC_AudioTrack*> VoiceTracks;
 	bool InitStatus = false;
 };
