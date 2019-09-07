@@ -13,3 +13,7 @@ ProtocolName UVC_ProtocolSwaper::GetProtocolName(FVC_Packet Packet) {
 
     return ProtocolName::NONE;
 };
+
+bool UVC_ProtocolSwaper::OnTestFunc_Implementation() {
+    return false;
+};

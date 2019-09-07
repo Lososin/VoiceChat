@@ -2,28 +2,60 @@
 
 #include "VC_AudioTrack.h"
 
-UVC_AudioTrack::UVC_AudioTrack() {
+UVC_AudioTrack::UVC_AudioTrack() : Channel(-1), InitStatus(false) {
+
 };
 
 UVC_AudioTrack::~UVC_AudioTrack() {
+
 };
 
-bool UVC_AudioTrack::Init(int Channel, int SampleRate, float Volume = 1.f) {
-	AudioStream.Reset(NewObject<USoundWaveProcedural>());
+bool UVC_AudioTrack::Init(int SampleRate, int NewChannel, float Volume) {
+	Deinit();
+
+	AudioStream = NewObject<USoundWaveProcedural>();
+	if (AudioStream == nullptr) {
+		UE_LOG(VoiceChatLog, Error, TEXT("AudioTrack doesn't Initialize"));
+		return false;
+	}
+
 	AudioStream->SetSampleRate(SampleRate);
 	AudioStream->SoundGroup = SOUNDGROUP_Voice;
 	AudioStream->bLooping = false;
 	AudioStream->NumChannels = 1;
-	AudioChannel = Channel;
+	Channel = NewChannel;
 
-	Sound.Reset(UGameplayStatics::SpawnSound2D(GetWorld(), AudioStream.Get(), Volume));
-	// TODO: Errors Handler
-	return true;
+	Sound = UGameplayStatics::SpawnSound2D(GetWorld(), AudioStream, Volume);
+
+	if (Sound == nullptr) {
+		UE_LOG(VoiceChatLog, Error, TEXT("AudioTrack doesn't Initialize"));
+		return false;
+	}
+
+	// auto NewSound = UGameplayStatics::CreateSound2D(GetWorld(), AudioStream.Get());
+
+	InitStatus = true;
+	return InitStatus;
 };
 
-void UVC_AudioTrack::AddWaveData(TArray<uint8> AudioData) {
-	if (!AudioStream.IsValid()) {
-		UE_LOG(VoiceChatLog, Error, TEXT("Voice Over is not Initialized"));
+void UVC_AudioTrack::Deinit() {
+	InitStatus = false;
+
+//	Sound.Reset();
+//	AudioStream.Reset();
+};
+
+bool UVC_AudioTrack::IsInit() const {
+	return InitStatus;
+};
+
+int UVC_AudioTrack::GetChannelNumber() const {
+	return Channel;
+};
+
+void UVC_AudioTrack::AddWaveData(TArray<uint8>& AudioData) {
+	if (InitStatus == false) {
+		UE_LOG(VoiceChatLog, Error, TEXT("Can't set Wave Data (AudioTrack wasn't initialize)"));
 		return;
 	}
 

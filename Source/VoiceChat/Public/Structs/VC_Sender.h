@@ -14,67 +14,33 @@ class UVC_Sender : public UObject {
 	GENERATED_BODY()
 
 public:
-	UVC_Sender() {
-	};
-	
+	UVC_Sender();
+	~UVC_Sender();
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|Sender")
+	bool Init(FString IpSrc, int PortSrc, FString IpDst, int PortDst, int BufferSize, int NewChannel = -1);
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|Sender")
+	void Deinit();
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|Sender")
+	bool IsInited() const;
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|Sender")
+	int GetChannelNumber() const;
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|Sender")
+	FVC_Address GetSourceInfo() const;
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|Sender")
+	bool SendPacket(FVC_Packet& Packet) const;
+
+private:
     TSharedPtr<FInternetAddr> RemoteAddress;
 	TUniquePtr<FSocket> SenderSocket;
 
 	FVC_Address SourceInfo;
+	int Channel;
 
-	int Channel = 0;
-
-	bool Init(FString IpSrc, int PortSrc, FString IpDst, int PortDst, int BufferSize) {
-		RemoteAddress = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
-
-		bool isVal;
-		RemoteAddress->SetIp(*IpDst, isVal);
-		if (!isVal) {
-			UE_LOG(VoiceChatLog, Error, TEXT("IP is not valid (Sender Init)"));
-			return false;
-		}
-
-		RemoteAddress->SetPort(PortDst);
-
-		FString SocketName = FString::Printf(TEXT("SNDR_SRV_SOCK_IP_%s_PORT_%d"), *IpSrc, PortSrc);	
-		SenderSocket.Reset(FUdpSocketBuilder(SocketName).AsReusable().WithBroadcast());
-		if (!SenderSocket.IsValid()) {
-			UE_LOG(VoiceChatLog, Error, TEXT("Sender Socket doesn't created (Sender Init)"));
-			return false;
-		}
-
-		SenderSocket->SetReceiveBufferSize(BufferSize, BufferSize);
-		SenderSocket->SetSendBufferSize(BufferSize, BufferSize);
-
-		SourceInfo = FVC_Address(IpSrc, PortSrc);
-
-		return true;
-	};
-
-	void SetChannel(int _Channel) {
-		Channel = _Channel;
-	};
-
-	bool SendPacket(FVC_Packet& Packet) {
-		if (!SenderSocket.IsValid()) {
-			return false;
-		}
-
-		FArrayWriter Writer;
-		Writer << Packet;
-
-		int32 BytesSent = 0;
-		SenderSocket->SendTo(Writer.GetData(), Writer.Num(), BytesSent, *RemoteAddress);
-
-		if (BytesSent <= 0) {
-			UE_LOG(VoiceChatLog, Error, TEXT("Socket is valid but the receiver received 0 bytes, make sure it is listening properly!"));
-			return false;
-		}
-
-		return true;
-	};
-
-	~UVC_Sender() {
-		//SenderSocket->Close();
-	};
+	bool InitStatus;
 };

@@ -17,8 +17,8 @@ class UVC_ProtocolSwaper : public UObject {
 public:
 	UVC_ProtocolSwaper();
 
-    UFUNCTION(BlueprintNativeEvent, Category = "VoiceChat,MicrophoneManager")
-	void OnTestFunc();
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
+	bool OnTestFunc();
 
 	ProtocolName GetProtocolName(FVC_Packet Packet);
 };

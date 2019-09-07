@@ -15,17 +15,28 @@ public:
 	UVC_AudioTrack();
 	~UVC_AudioTrack();
 
-	UFUNCTION(BlueprintCallable, Category = "VoiceChat,AudioTrack")
-	bool Init(int Channel, int SampleRate, float Volume);
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|AudioTrack")
+	bool Init(int SampleRate = 44100, int NewChannel = -1, float Volume = 1.f);
 
-	UFUNCTION(BlueprintCallable, Category = "VoiceChat,AudioTrack")
-	void AddWaveData(TArray<uint8> AudioData);
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|AudioTrack")
+	void Deinit();
 
-	UFUNCTION(BlueprintCallable, Category = "VoiceChat,AudioTrack")
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|AudioTrack")
+	bool IsInit() const;
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|AudioTrack")
+	int GetChannelNumber() const;
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|AudioTrack")
+	void AddWaveData(TArray<uint8>& AudioData);
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|AudioTrack")
 	void SetVolume(float Volume);
 
 private:
-	TUniquePtr<USoundWaveProcedural> AudioStream;
-	TUniquePtr<UAudioComponent> Sound;
-	int AudioChannel = -1;
+	USoundWaveProcedural* AudioStream;
+	UAudioComponent* Sound;
+
+	int Channel;
+	bool InitStatus;
 };

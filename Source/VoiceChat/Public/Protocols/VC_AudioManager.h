@@ -10,27 +10,17 @@ class UVC_AudioManager : public UObject {
 	GENERATED_BODY()
 
 public:
-	UVC_AudioManager() {
+	UVC_AudioManager();
 
-    }
+    UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|AudioManager")
+    bool CreateNewAudio(int SampleRate = 44100, int NewChannel = -1, float Volume = 1.f);
 
-	bool Init() {
-        return 1;
-    }
+    UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|AudioManager")
+    void SetData(TArray<uint8> AudioData, int Channel);
 
-    bool CreateNewAudio() {
-        return false;
-    }
-
-    void SetData() {
-
-    };
-
-    void Deinit() {
-        
-    }
+    UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|AudioManager")
+    void SetVolume(float NewVolume, int Channel);
 
 private:
-    TArray<UVC_AudioTrack*> VoiceTracks;
-	bool InitStatus = false;
+    TArray<TUniquePtr<UVC_AudioTrack>> AudioTracks;
 };

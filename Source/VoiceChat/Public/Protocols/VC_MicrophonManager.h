@@ -10,88 +10,28 @@ class UVC_MicrophonManager : public UObject {
 	GENERATED_BODY()
 
 public:
-	UVC_MicrophonManager() {
+	UVC_MicrophonManager();
+	~UVC_MicrophonManager();
 
-	};
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|MicrophoneManager")
+	bool Init(int SampleRate = 44100);
 
-	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
-	bool Init(int SampleRate = 44100) {
-		Deinit();
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|MicrophoneManager")
+	void Deinit();
 
-		FVoiceModule& VoiceModule = FVoiceModule::Get();
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|MicrophoneManager")
+	bool IsInited() const;
 
-		if (!VoiceModule.DoesPlatformSupportVoiceCapture()) {
-			UE_LOG(VoiceChatLog, Error, TEXT("Voice Module Does not Support"));
-			return false;
-		}
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|MicrophoneManager")
+    TArray<uint8> GetVoiceBuffer(bool& isValidBuff) const;
 
-		if (!VoiceModule.IsAvailable()) {
-			UE_LOG(VoiceChatLog, Error, TEXT("Voice Module Does not Available"));
-			return false;
-		}
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|MicrophoneManager")
+	void SetMicVolume(float Volume = 1.f);
 
-		if (!VoiceModule.IsVoiceEnabled()) {
-			UE_LOG(VoiceChatLog, Error, TEXT("Voice Module Does not Enable"));
-			return false;
-		}
-
-		VoiceCapture = VoiceModule.CreateVoiceCapture(TEXT("Default Device"), SampleRate, 1);
-
-		if (!VoiceCapture.IsValid()) {
-			return false;
-		}
-
-		VoiceCapture->Start();
-
-		InitStatus = true;
-		return InitStatus;
-	};
-
-	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
-    TArray<uint8> GetVoiceBuffer(bool& isValidBuff) {
-		isValidBuff = false;
-		
-		if (!InitStatus || !VoiceCapture->IsCapturing()) {
-			return TArray<uint8>();
-		}
-
-		uint32 AvailableSize;
-		uint8 buff[44100];
-
-		if (VoiceCapture->GetCaptureState(AvailableSize) == EVoiceCaptureState::Type::Ok) {
-			VoiceCapture->GetVoiceData(buff, 44100, AvailableSize);
-			isValidBuff = true;
-		}
-
-		return TArray<uint8>(buff, AvailableSize);
-	};
-
-	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
-	void SetMicVolume(float Volume = 1.f) {
-		TSharedPtr<UAudioComponent> AudioComponent(CreateDefaultSubobject<UAudioComponent>(TEXT("VoiceCaptureComponent")));
-		AudioComponent->PitchMultiplier = 0.85f;
-		AudioComponent->VolumeMultiplier = Volume;
-	};
-
-	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
-	void SetMicThreshold(float Threshold = 0.01f) {
-		UVOIPStatics::SetMicThreshold(Threshold);
-	};
-
-	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
-	bool IsInited() {
-		return InitStatus;
-	};
-
-	UFUNCTION(BlueprintCallable, Category = "VoiceChat,MicrophoneManager")
-	void Deinit() {
-		InitStatus = false;
-		if (VoiceCapture.IsValid()) {
-			VoiceCapture->Stop();
-		}
-	};
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|MicrophoneManager")
+	void SetMicThreshold(float Threshold = 0.01f);
 
 private:
 	TSharedPtr<IVoiceCapture> VoiceCapture;
-	bool InitStatus = false;
+	bool InitStatus;
 };
