@@ -8,7 +8,7 @@ ProtocolName UVC_ProtocolSwaper::GetProtocolName(FVC_Packet Packet) {
     if (Packet.Channel == -1) {
         return ProtocolName::CHANNEL_ASSIGNER;
     } else {
-        return ProtocolName::VOICE_BROADCAST;
+        return ProtocolName::VOICE_TRANSMITE;
     }
 
     return ProtocolName::NONE;

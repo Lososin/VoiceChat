@@ -3,15 +3,15 @@
 #include "CoreMinimal.h"
 #include "Kismet/GameplayStatics.h"
 #include "VoiceModule.h"
-#include "VC_MicrophonManager.generated.h"
+#include "VC_MicrophoneManager.generated.h"
 
 UCLASS(ClassGroup = VoiceChat, Blueprintable)
-class UVC_MicrophonManager : public UObject {
+class UVC_MicrophoneManager : public UObject {
 	GENERATED_BODY()
 
 public:
-	UVC_MicrophonManager();
-	~UVC_MicrophonManager();
+	UVC_MicrophoneManager();
+	~UVC_MicrophoneManager();
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|MicrophoneManager")
 	bool Init(int SampleRate = 44100);
@@ -23,7 +23,7 @@ public:
 	bool IsInited() const;
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|MicrophoneManager")
-    TArray<uint8> GetVoiceBuffer(bool& isValidBuff) const;
+    TArray<uint8> GetVoiceBuffer(bool& isValidBuff);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|MicrophoneManager")
 	void SetMicVolume(float Volume = 1.f);

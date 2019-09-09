@@ -1,5 +1,3 @@
-#pragma once
-
 #include "VC_AudioTrack.h"
 
 UVC_AudioTrack::UVC_AudioTrack() : Channel(-1), InitStatus(false) {
@@ -7,12 +5,12 @@ UVC_AudioTrack::UVC_AudioTrack() : Channel(-1), InitStatus(false) {
 };
 
 UVC_AudioTrack::~UVC_AudioTrack() {
-
+	Deinit();
 };
 
-bool UVC_AudioTrack::Init(int SampleRate, int NewChannel, float Volume) {
+bool UVC_AudioTrack::Init(const UObject* WorldContextObject, int SampleRate, int NewChannel, float Volume) {
 	Deinit();
-
+	// TODO: Log wron context
 	AudioStream = NewObject<USoundWaveProcedural>();
 	if (AudioStream == nullptr) {
 		UE_LOG(VoiceChatLog, Error, TEXT("AudioTrack doesn't Initialize"));
@@ -25,14 +23,12 @@ bool UVC_AudioTrack::Init(int SampleRate, int NewChannel, float Volume) {
 	AudioStream->NumChannels = 1;
 	Channel = NewChannel;
 
-	Sound = UGameplayStatics::SpawnSound2D(GetWorld(), AudioStream, Volume);
+	SoundStream = UGameplayStatics::SpawnSound2D(WorldContextObject, AudioStream, Volume);
 
-	if (Sound == nullptr) {
+	if (SoundStream == nullptr) {
 		UE_LOG(VoiceChatLog, Error, TEXT("AudioTrack doesn't Initialize"));
 		return false;
 	}
-
-	// auto NewSound = UGameplayStatics::CreateSound2D(GetWorld(), AudioStream.Get());
 
 	InitStatus = true;
 	return InitStatus;
@@ -41,8 +37,15 @@ bool UVC_AudioTrack::Init(int SampleRate, int NewChannel, float Volume) {
 void UVC_AudioTrack::Deinit() {
 	InitStatus = false;
 
-//	Sound.Reset();
-//	AudioStream.Reset();
+	// TODO: Memory fix
+	// if (SoundStream != nullptr) {
+	// 	SoundStream->Stop();
+	// 	//delete SoundStream;
+	// }
+
+	// if (AudioStream != nullptr) {
+	// 	delete AudioStream;
+	// }
 };
 
 bool UVC_AudioTrack::IsInit() const {
@@ -53,15 +56,17 @@ int UVC_AudioTrack::GetChannelNumber() const {
 	return Channel;
 };
 
-void UVC_AudioTrack::AddWaveData(TArray<uint8>& AudioData) {
+bool UVC_AudioTrack::AddWaveData(TArray<uint8> AudioData) {
 	if (InitStatus == false) {
 		UE_LOG(VoiceChatLog, Error, TEXT("Can't set Wave Data (AudioTrack wasn't initialize)"));
-		return;
+		return false;
 	}
 
 	AudioStream->QueueAudio(AudioData.GetData(), AudioData.Num());
+
+	return true;
 };
 
 void UVC_AudioTrack::SetVolume(float Volume = 1.f) {
-	Sound->VolumeMultiplier = Volume;
+	SoundStream->AdjustVolume(1.f, Volume);
 };

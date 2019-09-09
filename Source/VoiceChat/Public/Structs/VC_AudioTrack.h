@@ -16,7 +16,7 @@ public:
 	~UVC_AudioTrack();
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|AudioTrack")
-	bool Init(int SampleRate = 44100, int NewChannel = -1, float Volume = 1.f);
+	bool Init(const UObject* WorldContextObject, int SampleRate = 44100, int NewChannel = -1, float Volume = 1.f);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|AudioTrack")
 	void Deinit();
@@ -28,14 +28,14 @@ public:
 	int GetChannelNumber() const;
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|AudioTrack")
-	void AddWaveData(TArray<uint8>& AudioData);
+	bool AddWaveData(TArray<uint8> AudioData);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|AudioTrack")
 	void SetVolume(float Volume);
 
 private:
 	USoundWaveProcedural* AudioStream;
-	UAudioComponent* Sound;
+	UAudioComponent* SoundStream;
 
 	int Channel;
 	bool InitStatus;

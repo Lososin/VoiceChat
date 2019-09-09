@@ -13,10 +13,6 @@ class UVC_VoiceBroadcast : public UObject {
 public:
 	UVC_VoiceBroadcast();
 
-	void SetSendersManager(TSharedPtr<UVC_SendersManager>& Manager);
-
-	void VoiceBroadcast(FVC_Packet Packet, const UVC_SendersManager& Manager);
-
-private:
-	TSharedPtr<UVC_SendersManager> SendersManager;
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Protocols|VoiceBroadcast")
+	void VoiceBroadcast(FVC_Packet Packet, UVC_SendersManager* Manager);
 };

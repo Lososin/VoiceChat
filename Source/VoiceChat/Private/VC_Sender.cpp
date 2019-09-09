@@ -45,10 +45,10 @@ bool UVC_Sender::Init(FString IpSrc, int PortSrc, FString IpDst, int PortDst, in
 void UVC_Sender::Deinit() {
 	InitStatus = false;
 	Channel = -1;
-	RemoteAddress.Reset();
 	if (SenderSocket.IsValid()) {
 		SenderSocket->Close();
 	}
+	RemoteAddress.Reset();
 };
 
 bool UVC_Sender::IsInited() const {
@@ -63,7 +63,7 @@ FVC_Address UVC_Sender::GetSourceInfo() const {
 	return SourceInfo;
 };
 
-bool UVC_Sender::SendPacket(FVC_Packet& Packet) const {
+bool UVC_Sender::SendPacket(FVC_Packet Packet) const {
 	if (InitStatus == false) {
 		return false;
 	}

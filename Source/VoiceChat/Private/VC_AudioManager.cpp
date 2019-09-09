@@ -1,23 +1,23 @@
 #include "VC_AudioManager.h"
-
+#pragma optimize("", off)
 UVC_AudioManager::UVC_AudioManager() {
 
 };
 
-bool UVC_AudioManager::CreateNewAudio(int SampleRate, int NewChannel, float Volume) {
-    TUniquePtr<UVC_AudioTrack> NewAudio(NewObject<UVC_AudioTrack>());
+bool UVC_AudioManager::CreateNewAudio(const UObject* WorldContextObject, int SampleRate, int NewChannel, float Volume) {
+    UVC_AudioTrack* NewAudio = NewObject<UVC_AudioTrack>();
 
-    if (!NewAudio.IsValid()) {
+    if (NewAudio == nullptr) {
         // TODO: LOG
         return false;
     }
 
-    if (!NewAudio->Init(SampleRate, NewChannel, Volume)) {
+    if (!NewAudio->Init(WorldContextObject, SampleRate, NewChannel, Volume)) {
         // TODO: LOG
         return false;
     }
 
-    AudioTracks.Add(std::move(NewAudio));
+    AudioTracks.Add(NewAudio);
     return true;
 };
 
@@ -41,4 +41,10 @@ void UVC_AudioManager::SetVolume(float Volume, int Channel) {
     }
 
     // TODO: log this channel didn't find
-}
+};
+
+void UVC_AudioManager::DeleteAllChannels() {
+    AudioTracks.Empty();
+};
+
+#pragma optimize("", on)

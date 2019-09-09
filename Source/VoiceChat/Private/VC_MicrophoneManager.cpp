@@ -1,14 +1,14 @@
-#include "VC_MicrophonManager.h"
+#include "VC_MicrophoneManager.h"
 
-UVC_MicrophonManager::UVC_MicrophonManager() : InitStatus(false) {
+UVC_MicrophoneManager::UVC_MicrophoneManager() : InitStatus(false) {
 
 };
 
-UVC_MicrophonManager::~UVC_MicrophonManager() {
+UVC_MicrophoneManager::~UVC_MicrophoneManager() {
     Deinit();
 };
 
-bool UVC_MicrophonManager::Init(int SampleRate) {
+bool UVC_MicrophoneManager::Init(int SampleRate) {
 	Deinit();
 
 	FVoiceModule& VoiceModule = FVoiceModule::Get();
@@ -37,7 +37,7 @@ bool UVC_MicrophonManager::Init(int SampleRate) {
 	return InitStatus;
 };
 
-TArray<uint8> UVC_MicrophonManager::GetVoiceBuffer(bool& isValidBuff) const {
+TArray<uint8> UVC_MicrophoneManager::GetVoiceBuffer(bool& isValidBuff) {
 	isValidBuff = false;
 	
 	if (InitStatus == false) {
@@ -54,22 +54,19 @@ TArray<uint8> UVC_MicrophonManager::GetVoiceBuffer(bool& isValidBuff) const {
 	return TArray<uint8>(buff, AvailableSize);
 };
 
-void UVC_MicrophonManager::SetMicVolume(float Volume) {
+void UVC_MicrophoneManager::SetMicVolume(float Volume) {
     // TODO: SetMicVolume func
-	TSharedPtr<UAudioComponent> AudioComponent(CreateDefaultSubobject<UAudioComponent>(TEXT("VoiceCaptureComponent")));
-	AudioComponent->PitchMultiplier = 0.85f;
-	AudioComponent->VolumeMultiplier = Volume;
 };
 
-void UVC_MicrophonManager::SetMicThreshold(float Threshold) {
+void UVC_MicrophoneManager::SetMicThreshold(float Threshold) {
 	UVOIPStatics::SetMicThreshold(Threshold);
 };
 
-bool UVC_MicrophonManager::IsInited() const {
+bool UVC_MicrophoneManager::IsInited() const {
 	return InitStatus;
 };
 
-void UVC_MicrophonManager::Deinit() {
+void UVC_MicrophoneManager::Deinit() {
 	InitStatus = false;
 	if (VoiceCapture.IsValid()) {
 		VoiceCapture->Stop();

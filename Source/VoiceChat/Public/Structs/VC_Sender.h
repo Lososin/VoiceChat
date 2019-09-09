@@ -33,7 +33,7 @@ public:
 	FVC_Address GetSourceInfo() const;
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|Sender")
-	bool SendPacket(FVC_Packet& Packet) const;
+	bool SendPacket(FVC_Packet Packet) const;
 
 private:
     TSharedPtr<FInternetAddr> RemoteAddress;

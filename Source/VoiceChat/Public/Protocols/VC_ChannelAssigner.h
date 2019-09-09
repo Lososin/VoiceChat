@@ -3,9 +3,11 @@
 #include "CoreMinimal.h"
 #include "VC_Address.h"
 #include "VC_Sender.h"
+#include "VC_Packet.h"
 #include "VC_ChannelAssigner.generated.h"
 
-enum class VC_ConnectionProtocolStagesClient : int {
+UENUM(Blueprintable)
+enum class VC_ConnectionProtocolStagesClient : uint8 {
 	IDLE = 0,
 	SEND_REQUEST,
 	AWAIT_CHANNEL,
@@ -21,6 +23,25 @@ class UVC_ChannelAssigner : public UObject {
 public:
 	UVC_ChannelAssigner();
 
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Protocols|ChannelAssigner")
+	int GetChannel() const;
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Protocols|ChannelAssigner")
+	FVC_Packet GetRequestPacket();
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Protocols|ChannelAssigner")
+	VC_ConnectionProtocolStagesClient GetStatus() const;
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Protocols|ChannelAssigner")
+	void SetChannel(int NewChannel);
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Protocols|ChannelAssigner")
+	void UpdateStatus();
+
 private:
-	VC_ConnectionProtocolStagesClient CurrentStage = VC_ConnectionProtocolStagesClient::IDLE;
+	//TODO: Defaults to constructor
+	VC_ConnectionProtocolStagesClient CurrentStage = VC_ConnectionProtocolStagesClient::SEND_REQUEST;
+	int Channel = -1;
+
+	int FramesToWait;
 };

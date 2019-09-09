@@ -7,7 +7,7 @@
 enum class ProtocolName : int {
     NONE = 0,
     CHANNEL_ASSIGNER,
-    VOICE_BROADCAST,
+    VOICE_TRANSMITE,
 };
 
 UCLASS(ClassGroup = VoiceChat, Blueprintable)

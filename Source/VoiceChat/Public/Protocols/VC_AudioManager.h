@@ -13,7 +13,7 @@ public:
 	UVC_AudioManager();
 
     UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|AudioManager")
-    bool CreateNewAudio(int SampleRate = 44100, int NewChannel = -1, float Volume = 1.f);
+    bool CreateNewAudio(const UObject* WorldContextObject, int SampleRate = 44100, int NewChannel = -1, float Volume = 1.f);
 
     UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|AudioManager")
     void SetData(TArray<uint8> AudioData, int Channel);
@@ -21,6 +21,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|AudioManager")
     void SetVolume(float NewVolume, int Channel);
 
+    UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|AudioManager")
+    void DeleteAllChannels();
+
 private:
-    TArray<TUniquePtr<UVC_AudioTrack>> AudioTracks;
+    TArray<UVC_AudioTrack*> AudioTracks;
 };
