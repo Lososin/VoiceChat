@@ -27,6 +27,18 @@ bool AVC_Client::Init() {
         // TODO: Logs
         return false;
     }
+    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 1)) {     // For Playback
+        // TODO: Logs
+        return false;
+    }
+    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 2)) {     // For Playback
+        // TODO: Logs
+        return false;
+    }
+    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 3)) {     // For Playback
+        // TODO: Logs
+        return false;
+    }
 
     Sender = NewObject<UVC_Sender>();
     if (!Sender->Init("0.0.0.0", 0, Settings.ServerIP, Settings.ServerPort, Settings.BufferSize)) {
