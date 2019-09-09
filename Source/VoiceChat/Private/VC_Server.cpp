@@ -23,6 +23,12 @@ bool AVC_Server::Init() {
     Receiver->UDPReceiver->OnDataReceived().BindUObject(this, &AVC_Server::UDPReceive);
 	Receiver->UDPReceiver->Start();
 
+	SendersManager = NewObject<UVC_SendersManager>();
+	if (SendersManager == nullptr) {
+		// TODO: logs
+		return false;
+	}
+
 	InitStatus = true;
 	return InitStatus;
 };

@@ -45,9 +45,9 @@ bool UVC_Sender::Init(FString IpSrc, int PortSrc, FString IpDst, int PortDst, in
 void UVC_Sender::Deinit() {
 	InitStatus = false;
 	Channel = -1;
-	if (SenderSocket.IsValid()) {
-		SenderSocket->Close();
-	}
+	// if (SenderSocket.IsValid()) {
+	// 	SenderSocket->Close();
+	// }
 	RemoteAddress.Reset();
 };
 
