@@ -122,7 +122,7 @@ void AVC_Client::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 
     if (CanPacketBeSet(Packet)) {
         if (ChannelAssigner->GetChannel() == Packet.Channel) {
-            AudioManager->SetData(Packet.VoiceData, 0);
+            //AudioManager->SetData(Packet.VoiceData, 0);
             return;
         }
 

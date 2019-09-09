@@ -49,6 +49,9 @@ TArray<uint8> UVC_MicrophoneManager::GetVoiceBuffer(bool& isValidBuff) {
 	if (VoiceCapture->GetCaptureState(AvailableSize) == EVoiceCaptureState::Type::Ok) {
 		VoiceCapture->GetVoiceData(buff, 4410000, AvailableSize);
 		isValidBuff = true;
+		if (AvailableSize > 4410000) {
+			isValidBuff = false;
+		}
 	}
 
 	return TArray<uint8>(buff, AvailableSize);
