@@ -4,6 +4,7 @@
 #include "VC_Settings.h"
 #include "VC_Packet.h"
 #include "VC_Receiver.h"
+#include "VC_VoiceBroadcast.h"
 #include "VC_SendersManager.h"
 #include "VC_Server.generated.h"
 
@@ -39,7 +40,12 @@ protected:
 private:
 	UVC_SendersManager* SendersManager;
     UVC_Receiver* Receiver;
+	UVC_VoiceBroadcast* VoiceBroadcast;
 
 	FVC_Settings Settings;
 	bool InitStatus;
+
+	// TODO: to Constructor
+	// TODO: Mutex
+	int AllChannels = 1;
 };

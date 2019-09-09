@@ -27,6 +27,22 @@ bool AVC_Client::Init() {
         // TODO: Logs
         return false;
     }
+    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 1)) {     // For Playback
+        // TODO: Logs
+        return false;
+    }
+    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 2)) {     // For Playback
+        // TODO: Logs
+        return false;
+    }
+    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 3)) {     // For Playback
+        // TODO: Logs
+        return false;
+    }
+    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 4)) {     // For Playback
+        // TODO: Logs
+        return false;
+    }
 
     Sender = NewObject<UVC_Sender>();
     if (!Sender->Init("0.0.0.0", 0, Settings.ServerIP, Settings.ServerPort, Settings.BufferSize)) {
@@ -108,7 +124,11 @@ void AVC_Client::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
         return;
     }
 
-    if (CanPacketBeSet(Packet) && Packet.Channel != ChannelAssigner->GetChannel()) {
+    if (CanPacketBeSet(Packet)) {
+        if (ChannelAssigner->GetChannel() == Packet.Channel) {
+            AudioManager->SetData(Packet.VoiceData, 0);
+        }
+
         AudioManager->SetData(Packet.VoiceData, Packet.Channel);
         return;
     }

@@ -29,6 +29,12 @@ bool AVC_Server::Init() {
 		return false;
 	}
 
+	VoiceBroadcast = NewObject<UVC_VoiceBroadcast>();
+	if (VoiceBroadcast == nullptr) {
+		// TODO: Logs
+		return false;
+	}
+
 	InitStatus = true;
 	return InitStatus;
 };
@@ -39,9 +45,17 @@ void AVC_Server::Deinit() {
 	if (Receiver != nullptr) {
         Receiver->Deinit();
     }
+
+	if (VoiceBroadcast != nullptr) {
+		delete VoiceBroadcast;
+	}
 };
 
 void AVC_Server::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {
+	if (InitStatus == false) {
+		return;
+	}
+
 	FVC_Address ClientInfo(FVC_Address(EndPt.Address.ToString(), EndPt.Port));
 
 	FVC_Packet Packet;
@@ -50,13 +64,17 @@ void AVC_Server::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 	BPEvent_UDPReceive(Packet, ClientInfo);
 
 	if (Packet.Meta == FString("CHANNELASSIGN")) {
-		if (!SendersManager->CreateNewSender(ClientInfo, Settings, 1)) {
+		int NewChannel = AllChannels;
+		AllChannels++;
+		if (!SendersManager->CreateNewSender(ClientInfo, Settings, NewChannel)) {
 			//todo: logs
 			return;
 		}
-		Packet.Channel = 1;
-		SendersManager->SendData(Packet, 1);
+		Packet.Channel = NewChannel;
+		SendersManager->SendData(Packet, NewChannel);
 	}
+
+	VoiceBroadcast->VoiceBroadcast(Packet, SendersManager);
 };
 
 void AVC_Server::EndPlay(const EEndPlayReason::Type EndPlayReason) {

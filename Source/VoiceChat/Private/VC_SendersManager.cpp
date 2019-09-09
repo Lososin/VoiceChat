@@ -7,6 +7,7 @@ UVC_SendersManager::UVC_SendersManager() {
 bool UVC_SendersManager::CreateNewSender(FVC_Address ClientSrcAddress, FVC_Settings Settings, int ChannelNumber) {
     TUniquePtr<UVC_Sender> NewSender(NewObject<UVC_Sender>());
 
+    //TODO: Check if already exist
 	if (!NewSender->Init(ClientSrcAddress.IP, ClientSrcAddress.Port, ClientSrcAddress.IP, Settings.ClientPort, Settings.BufferSize, ChannelNumber)) {
         // TODO: Log parametrs
         return false;
