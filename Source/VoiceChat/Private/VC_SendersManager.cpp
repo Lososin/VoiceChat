@@ -12,7 +12,7 @@ bool UVC_SendersManager::CreateNewSender(FVC_Address ClientSrcAddress, FVC_Setti
         return false;
     }
 
-    //Senders.Add(NewSender);
+    Senders.Add(std::move(NewSender));
 
 	return true;
 };
