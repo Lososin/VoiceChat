@@ -10,7 +10,7 @@ int UVC_ChannelAssigner::GetChannel() const {
 
 FVC_Packet UVC_ChannelAssigner::GetRequestPacket() {
     CurrentStage = VC_ConnectionProtocolStagesClient::AWAIT_CHANNEL;
-    FramesToWait = 1000;
+    FramesToWait = 100;
     return FVC_Packet(FString("CHANNELASSIGN"), TArray<uint8>());
 };
 

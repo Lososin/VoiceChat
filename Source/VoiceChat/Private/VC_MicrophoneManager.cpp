@@ -40,7 +40,7 @@ bool UVC_MicrophoneManager::Init(int SampleRate) {
 TArray<uint8> UVC_MicrophoneManager::GetVoiceBuffer(bool& isValidBuff) {
 	isValidBuff = false;
 	
-	if (InitStatus == false) {
+	if (InitStatus == false) { 
 		return TArray<uint8>();
 	}
 

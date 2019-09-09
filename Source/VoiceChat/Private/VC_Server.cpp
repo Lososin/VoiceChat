@@ -45,10 +45,10 @@ void AVC_Server::Deinit() {
 	if (Receiver != nullptr) {
         Receiver->Deinit();
     }
-
-	if (VoiceBroadcast != nullptr) {
-		delete VoiceBroadcast;
-	}
+	//todo: memory fix
+	// if (VoiceBroadcast != nullptr) {
+	// 	delete VoiceBroadcast;
+	// }
 };
 
 void AVC_Server::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {
@@ -72,6 +72,7 @@ void AVC_Server::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 		}
 		Packet.Channel = NewChannel;
 		SendersManager->SendData(Packet, NewChannel);
+		return;
 	}
 
 	VoiceBroadcast->VoiceBroadcast(Packet, SendersManager);

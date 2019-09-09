@@ -27,22 +27,6 @@ bool AVC_Client::Init() {
         // TODO: Logs
         return false;
     }
-    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 1)) {     // For Playback
-        // TODO: Logs
-        return false;
-    }
-    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 2)) {     // For Playback
-        // TODO: Logs
-        return false;
-    }
-    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 3)) {     // For Playback
-        // TODO: Logs
-        return false;
-    }
-    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 4)) {     // For Playback
-        // TODO: Logs
-        return false;
-    }
 
     Sender = NewObject<UVC_Sender>();
     if (!Sender->Init("0.0.0.0", 0, Settings.ServerIP, Settings.ServerPort, Settings.BufferSize)) {
@@ -166,9 +150,9 @@ void AVC_Client::Tick(float DeltaTime) {
         return;
     }
 
-    if (bAllowPlayBack == true) {
-        AudioManager->SetData(Data, 0);
-    }
+    // if (bAllowPlayBack == true) {
+    //     AudioManager->SetData(Data, 0);
+    // }
 
     FVC_Packet NewPacket(GetVoiceMeta(), Data);
     NewPacket.Channel = ChannelAssigner->GetChannel();
