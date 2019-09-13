@@ -27,15 +27,15 @@ bool AVC_Client::Init() {
         // TODO: Logs
         return false;
     }
-    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 1)) {     // For Playback
+    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 1)) {    
         // TODO: Logs
         return false;
     }
-    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 2)) {     // For Playback
+    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 2)) {    
         // TODO: Logs
         return false;
     }
-    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 3)) {     // For Playback
+    if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 3)) {     
         // TODO: Logs
         return false;
     }
@@ -134,7 +134,7 @@ void AVC_Client::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 void AVC_Client::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	Super::EndPlay(EndPlayReason);
 
-	Deinit();
+	//Deinit();
 };
 
 void AVC_Client::Tick(float DeltaTime) {
