@@ -46,9 +46,9 @@ void AVC_Server::Deinit() {
         Receiver->Deinit();
     }
 	//todo: memory fix
-	// if (VoiceBroadcast != nullptr) {
-	// 	delete VoiceBroadcast;
-	// }
+	if (VoiceBroadcast != nullptr) {
+		delete VoiceBroadcast;
+	}
 };
 
 void AVC_Server::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {
@@ -70,6 +70,7 @@ void AVC_Server::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 			//todo: logs
 			return;
 		}
+		UE_LOG(VoiceChatLog, Warning, TEXT("Client %d connected"), NewChannel);
 		Packet.Channel = NewChannel;
 		SendersManager->SendData(Packet, NewChannel);
 		return;

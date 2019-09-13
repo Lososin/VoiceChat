@@ -5,7 +5,7 @@ UVC_AudioTrack::UVC_AudioTrack() : Channel(-1), InitStatus(false) {
 };
 
 UVC_AudioTrack::~UVC_AudioTrack() {
-	Deinit();
+
 };
 
 bool UVC_AudioTrack::Init(const UObject* WorldContextObject, int SampleRate, int NewChannel, float Volume) {
@@ -38,14 +38,14 @@ void UVC_AudioTrack::Deinit() {
 	InitStatus = false;
 
 	// TODO: Memory fix
-	// if (SoundStream != nullptr) {
-	// 	SoundStream->Stop();
-	// 	//delete SoundStream;
-	// }
+	if (SoundStream != nullptr) {
+		SoundStream->Stop();
+		delete SoundStream;
+	}
 
-	// if (AudioStream != nullptr) {
-	// 	delete AudioStream;
-	// }
+	if (AudioStream != nullptr) {
+		delete AudioStream;
+	}
 };
 
 bool UVC_AudioTrack::IsInit() const {

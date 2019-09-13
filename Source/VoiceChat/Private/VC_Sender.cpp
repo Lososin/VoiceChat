@@ -5,7 +5,7 @@ UVC_Sender::UVC_Sender() : Channel(-1), InitStatus(false) {
 };
 	
 UVC_Sender::~UVC_Sender() {
-	Deinit();
+
 };
 
 
@@ -47,10 +47,10 @@ void UVC_Sender::Deinit() {
 	Channel = -1;
 
 	// TODO: Memory fix
-	// if (SenderSocket.IsValid()) {
-	// 	SenderSocket->Close();
-	// }
-	//RemoteAddress.Reset();
+	if (SenderSocket.IsValid()) {
+		SenderSocket->Close();
+	}
+	RemoteAddress.Reset();
 };
 
 bool UVC_Sender::IsInited() const {

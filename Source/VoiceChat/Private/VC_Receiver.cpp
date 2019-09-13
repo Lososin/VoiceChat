@@ -5,7 +5,7 @@ UVC_Receiver::UVC_Receiver() : InitStatus(false) {
 };
 
 UVC_Receiver::~UVC_Receiver() {
-    Deinit();
+
 };
 
 bool UVC_Receiver::Init(FString Ip, int Port, int BufferSize) {
