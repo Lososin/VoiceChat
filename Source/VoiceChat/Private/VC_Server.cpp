@@ -17,7 +17,7 @@ bool AVC_Server::Init() {
 
 	Receiver = NewObject<UVC_Receiver>();
     if (!Receiver->Init(FString("0.0.0.0"), Settings.ServerPort, Settings.BufferSize)) {
-        // TODO: Logs
+        UE_LOG(VoiceChatLog, Error, TEXT("Server Receiver doesn't init"));
         return false;
     }
     Receiver->UDPReceiver->OnDataReceived().BindUObject(this, &AVC_Server::UDPReceive);
@@ -25,13 +25,13 @@ bool AVC_Server::Init() {
 
 	SendersManager = NewObject<UVC_SendersManager>();
 	if (SendersManager == nullptr) {
-		// TODO: logs
+		UE_LOG(VoiceChatLog, Error, TEXT("Server SendersManager doesn't init"));
 		return false;
 	}
 
 	VoiceBroadcast = NewObject<UVC_VoiceBroadcast>();
 	if (VoiceBroadcast == nullptr) {
-		// TODO: Logs
+		UE_LOG(VoiceChatLog, Error, TEXT("Server VoiceBroadcastProtocol doesn't init"));
 		return false;
 	}
 

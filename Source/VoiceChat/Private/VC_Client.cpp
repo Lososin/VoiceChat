@@ -18,7 +18,7 @@ bool AVC_Client::Init() {
 
     MicrophoneManager = NewObject<UVC_MicrophoneManager>();
     if (!MicrophoneManager->Init(Settings.SampleRate)) {
-        //TODO: Logs
+        UE_LOG(VoiceChatLog, Error, TEXT("Client Microphone doesn't init"));
         return false;
     }
 
@@ -42,13 +42,13 @@ bool AVC_Client::Init() {
 
     Sender = NewObject<UVC_Sender>();
     if (!Sender->Init("0.0.0.0", 0, Settings.ServerIP, Settings.ServerPort, Settings.BufferSize)) {
-        // TODO: Logs
+        UE_LOG(VoiceChatLog, Error, TEXT("Client Sender doesn't init"));
         return false;
     }
 
     Receiver = NewObject<UVC_Receiver>();
     if (!Receiver->Init(FString("0.0.0.0"), Settings.ClientPort, Settings.BufferSize)) {
-        // TODO: Logs
+        UE_LOG(VoiceChatLog, Error, TEXT("Client Receiver doesn't init"));
         return false;
     }
     Receiver->UDPReceiver->OnDataReceived().BindUObject(this, &AVC_Client::UDPReceive);
@@ -56,7 +56,7 @@ bool AVC_Client::Init() {
 
     ChannelAssigner = NewObject<UVC_ChannelAssigner>();
     if (ChannelAssigner == nullptr) {
-        //TODO: log
+        UE_LOG(VoiceChatLog, Error, TEXT("Client ChannelAssigner doesn't init"));
         return false;
     }
 
