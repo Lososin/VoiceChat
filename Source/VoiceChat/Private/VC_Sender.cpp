@@ -24,8 +24,8 @@ bool UVC_Sender::Init(FString IpSrc, int PortSrc, FString IpDst, int PortDst, in
 	RemoteAddress->SetPort(PortDst);
 
 	FString SocketName = FString::Printf(TEXT("SNDR_SRV_SOCK_IP_%s_PORT_%d"), *IpSrc, PortSrc);	
-	SenderSocket.Reset(FUdpSocketBuilder(SocketName).AsReusable().WithBroadcast());
-	if (!SenderSocket.IsValid()) {
+	SenderSocket = FUdpSocketBuilder(SocketName).AsReusable().WithBroadcast();
+	if (SenderSocket == nullptr) {
 		UE_LOG(VoiceChatLog, Error, TEXT("Sender Socket doesn't created (Sender Init)"));
 		return false;
 	}
@@ -47,8 +47,9 @@ void UVC_Sender::Deinit() {
 	Channel = -1;
 
 	// TODO: Memory fix
-	if (SenderSocket.IsValid()) {
+	if (SenderSocket != nullptr) {
 		SenderSocket->Close();
+		//delete SenderSocket;
 	}
 	RemoteAddress.Reset();
 };
@@ -74,6 +75,9 @@ bool UVC_Sender::SendPacket(FVC_Packet Packet) const {
 	Writer << Packet;
 
 	int32 BytesSent = 0;
+	if (!RemoteAddress.IsValid()) {
+		return false;
+	}
 	SenderSocket->SendTo(Writer.GetData(), Writer.Num(), BytesSent, *RemoteAddress);
 	if (BytesSent <= 0) {
 		UE_LOG(VoiceChatLog, Error, TEXT("Socket is valid but the receiver received 0 bytes, make sure it is listening properly!"));
