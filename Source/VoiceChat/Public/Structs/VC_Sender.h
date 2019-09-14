@@ -37,7 +37,7 @@ public:
 
 private:
     TSharedPtr<FInternetAddr> RemoteAddress;
-	TUniquePtr<FSocket> SenderSocket;
+	FSocket* SenderSocket;
 
 	FVC_Address SourceInfo;
 	int Channel;

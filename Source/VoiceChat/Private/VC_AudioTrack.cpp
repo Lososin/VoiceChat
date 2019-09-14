@@ -5,7 +5,7 @@ UVC_AudioTrack::UVC_AudioTrack() : Channel(-1), InitStatus(false) {
 };
 
 UVC_AudioTrack::~UVC_AudioTrack() {
-	Deinit();
+
 };
 
 bool UVC_AudioTrack::Init(const UObject* WorldContextObject, int SampleRate, int NewChannel, float Volume) {
@@ -47,10 +47,6 @@ void UVC_AudioTrack::Deinit() {
 	}
 
 	UE_LOG(VoiceChatLog, Log, TEXT("AudioTrack: Deinited"));
-};
-
-bool UVC_AudioTrack::IsInit() const {
-	return InitStatus;
 };
 
 int UVC_AudioTrack::GetChannelNumber() const {

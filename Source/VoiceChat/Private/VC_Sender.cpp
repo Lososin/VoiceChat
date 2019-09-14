@@ -5,6 +5,11 @@ UVC_Sender::UVC_Sender() : Channel(-1), InitStatus(false) {
 };
 	
 UVC_Sender::~UVC_Sender() {
+<<<<<<< HEAD
+=======
+
+};
+>>>>>>> 48ce43b500b21a75e256d441b079f86a80d276da
 
 };
 
@@ -77,6 +82,9 @@ bool UVC_Sender::SendPacket(FVC_Packet Packet) const {
 	Writer << Packet;
 
 	int32 BytesSent = 0;
+	if (!RemoteAddress.IsValid()) {
+		return false;
+	}
 	SenderSocket->SendTo(Writer.GetData(), Writer.Num(), BytesSent, *RemoteAddress);
 	if (BytesSent <= 0) {
 		UE_LOG(VoiceChatLog, Error, TEXT("Sender: Socket is valid but Sended 0 bytes"));
