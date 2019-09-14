@@ -5,7 +5,7 @@ UVC_SendersManager::UVC_SendersManager() {
 };
 
 UVC_SendersManager::~UVC_SendersManager() {
-    DeleteAllChannels();
+
 };
 
 bool UVC_SendersManager::CreateNewSender(FVC_Address ClientSrcAddress, FVC_Settings Settings, int ChannelNumber) {

@@ -49,6 +49,10 @@ void UVC_AudioTrack::Deinit() {
 	UE_LOG(VoiceChatLog, Log, TEXT("AudioTrack: Deinited"));
 };
 
+bool UVC_AudioTrack::IsInited() const {
+	return InitStatus;
+};
+
 int UVC_AudioTrack::GetChannelNumber() const {
 	return Channel;
 };

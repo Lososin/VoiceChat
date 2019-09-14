@@ -78,10 +78,9 @@ void AVC_Server::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 		int NewChannel = AllChannels;
 		AllChannels++;
 		if (!SendersManager->CreateNewSender(ClientInfo, Settings, NewChannel)) {
-			UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Server: Assigned New Channel=%d"), NewChannel);
 			return;
 		}
-		UE_LOG(VoiceChatLog, Warning, TEXT("Client %d connected"), NewChannel);
+		UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Server: Assigned New Channel=%d"), NewChannel);
 		Packet.Channel = NewChannel;
 		SendersManager->SendData(Packet, NewChannel);
 		return;

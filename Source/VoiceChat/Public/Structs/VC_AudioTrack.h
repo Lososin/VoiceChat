@@ -22,7 +22,7 @@ public:
 	void Deinit();
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|AudioTrack")
-	bool IsInit() const;
+	bool IsInited() const;
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|AudioTrack")
 	int GetChannelNumber() const;

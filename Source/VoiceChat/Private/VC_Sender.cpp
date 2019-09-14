@@ -5,11 +5,6 @@ UVC_Sender::UVC_Sender() : Channel(-1), InitStatus(false) {
 };
 	
 UVC_Sender::~UVC_Sender() {
-<<<<<<< HEAD
-=======
-
-};
->>>>>>> 48ce43b500b21a75e256d441b079f86a80d276da
 
 };
 
@@ -28,8 +23,8 @@ bool UVC_Sender::Init(FString IpSrc, int PortSrc, FString IpDst, int PortDst, in
 	RemoteAddress->SetPort(PortDst);
 
 	FString SocketName = FString::Printf(TEXT("SNDR_SRV_SOCK_IP_%s_PORT_%d"), *IpSrc, PortSrc);	
-	SenderSocket.Reset(FUdpSocketBuilder(SocketName).AsReusable().WithBroadcast());
-	if (!SenderSocket.IsValid()) {
+	SenderSocket = FUdpSocketBuilder(SocketName).AsReusable().WithBroadcast();
+	if (SenderSocket == nullptr) {
 		UE_LOG(VoiceChatLog, Error, TEXT("Sender: SenderSocket not Created"));
 		return false;
 	}
@@ -51,9 +46,9 @@ void UVC_Sender::Deinit() {
 	InitStatus = false;
 	Channel = -1;
 
-	if (SenderSocket.IsValid()) {
+	if (SenderSocket != nullptr) {
 		SenderSocket->Close();
-		SenderSocket.Release();
+		delete SenderSocket;
 	}
 	RemoteAddress.Reset();
 
