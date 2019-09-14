@@ -22,6 +22,7 @@ class UVC_ChannelAssigner : public UObject {
 
 public:
 	UVC_ChannelAssigner();
+	~UVC_ChannelAssigner();
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Protocols|ChannelAssigner")
 	int GetChannel() const;
@@ -39,7 +40,6 @@ public:
 	void UpdateStatus();
 
 private:
-	//TODO: Defaults to constructor
 	VC_ConnectionProtocolStagesClient CurrentStage = VC_ConnectionProtocolStagesClient::SEND_REQUEST;
 	int Channel = -1;
 

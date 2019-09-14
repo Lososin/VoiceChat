@@ -7,14 +7,13 @@
 #include "VC_Sender.h"
 #include "VC_SendersManager.generated.h"
 
-//TODO : It can't dependend on the Channel
-
 UCLASS(ClassGroup = VoiceChat, Blueprintable)
 class UVC_SendersManager : public UObject {
 	GENERATED_BODY()
 
 public:
 	UVC_SendersManager();
+	~UVC_SendersManager();
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|SendersManager")
 	bool CreateNewSender(FVC_Address ClientSrcAddress, FVC_Settings Settings, int ChannelNumber);
@@ -27,6 +26,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|SendersManager")
 	TArray<int> GetChannelsArray() const;
+
+	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|SendersManager")
+	void DeleteAllChannels();
 
 	// TODO: delete channel feature
 private: 

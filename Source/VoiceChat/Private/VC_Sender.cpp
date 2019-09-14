@@ -5,9 +5,8 @@ UVC_Sender::UVC_Sender() : Channel(-1), InitStatus(false) {
 };
 	
 UVC_Sender::~UVC_Sender() {
-	Deinit();
-};
 
+};
 
 bool UVC_Sender::Init(FString IpSrc, int PortSrc, FString IpDst, int PortDst, int BufferSize, int NewChannel) {
 	Deinit();
@@ -17,7 +16,7 @@ bool UVC_Sender::Init(FString IpSrc, int PortSrc, FString IpDst, int PortDst, in
 	bool isVal;
 	RemoteAddress->SetIp(*IpDst, isVal);
 	if (!isVal) {
-		UE_LOG(VoiceChatLog, Error, TEXT("IP is not valid (Sender Init)"));
+		UE_LOG(VoiceChatLog, Error, TEXT("Sender: IPAddress is wrong"));
 		return false;
 	}
 
@@ -26,7 +25,7 @@ bool UVC_Sender::Init(FString IpSrc, int PortSrc, FString IpDst, int PortDst, in
 	FString SocketName = FString::Printf(TEXT("SNDR_SRV_SOCK_IP_%s_PORT_%d"), *IpSrc, PortSrc);	
 	SenderSocket.Reset(FUdpSocketBuilder(SocketName).AsReusable().WithBroadcast());
 	if (!SenderSocket.IsValid()) {
-		UE_LOG(VoiceChatLog, Error, TEXT("Sender Socket doesn't created (Sender Init)"));
+		UE_LOG(VoiceChatLog, Error, TEXT("Sender: SenderSocket not Created"));
 		return false;
 	}
 
@@ -38,6 +37,7 @@ bool UVC_Sender::Init(FString IpSrc, int PortSrc, FString IpDst, int PortDst, in
 
 	Channel = NewChannel;
 
+	UE_LOG(VoiceChatLog, Log, TEXT("Sender: Inited"));
 	InitStatus = true;
 	return InitStatus;
 };
@@ -46,11 +46,13 @@ void UVC_Sender::Deinit() {
 	InitStatus = false;
 	Channel = -1;
 
-	// TODO: Memory fix
-	// if (SenderSocket.IsValid()) {
-	// 	SenderSocket->Close();
-	// }
-	//RemoteAddress.Reset();
+	if (SenderSocket.IsValid()) {
+		SenderSocket->Close();
+		SenderSocket.Release();
+	}
+	RemoteAddress.Reset();
+
+	UE_LOG(VoiceChatLog, Log, TEXT("Sender: Deinited"));
 };
 
 bool UVC_Sender::IsInited() const {
@@ -67,6 +69,7 @@ FVC_Address UVC_Sender::GetSourceInfo() const {
 
 bool UVC_Sender::SendPacket(FVC_Packet Packet) const {
 	if (InitStatus == false) {
+		UE_LOG(VoiceChatLog, Error, TEXT("Sender: Not Inited (SendPacket)"));
 		return false;
 	}
 
@@ -76,7 +79,7 @@ bool UVC_Sender::SendPacket(FVC_Packet Packet) const {
 	int32 BytesSent = 0;
 	SenderSocket->SendTo(Writer.GetData(), Writer.Num(), BytesSent, *RemoteAddress);
 	if (BytesSent <= 0) {
-		UE_LOG(VoiceChatLog, Error, TEXT("Socket is valid but the receiver received 0 bytes, make sure it is listening properly!"));
+		UE_LOG(VoiceChatLog, Error, TEXT("Sender: Socket is valid but Sended 0 bytes"));
 		return false;
 	}
 

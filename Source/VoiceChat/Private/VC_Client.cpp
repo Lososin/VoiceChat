@@ -1,7 +1,11 @@
 #include "VC_Client.h"
-#pragma optimize("", off)
+
 AVC_Client::AVC_Client() {
 	PrimaryActorTick.bCanEverTick = true;
+
+};
+
+AVC_Client::~AVC_Client() {
 
 };
 
@@ -17,49 +21,52 @@ bool AVC_Client::Init() {
 	Deinit();
 
     MicrophoneManager = NewObject<UVC_MicrophoneManager>();
+    MicrophoneManager->AddToRoot();
     if (!MicrophoneManager->Init(Settings.SampleRate)) {
-        //TODO: Logs
+        UE_LOG(VoiceChatLog, Error, TEXT("VoiceChat Client: Microphone Manager not Inited"));
         return false;
     }
 
     AudioManager = NewObject<UVC_AudioManager>();
+    AudioManager->AddToRoot();
     if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 0)) {     // For Playback
-        // TODO: Logs
+        UE_LOG(VoiceChatLog, Error, TEXT("VoiceChat Client: Audio Manager not Inited"));
         return false;
     }
     if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 1)) {     // For Playback
-        // TODO: Logs
         return false;
     }
     if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 2)) {     // For Playback
-        // TODO: Logs
         return false;
     }
     if (!AudioManager->CreateNewAudio(GetWorld(), Settings.SampleRate, 3)) {     // For Playback
-        // TODO: Logs
         return false;
     }
 
     Sender = NewObject<UVC_Sender>();
+    Sender->AddToRoot();
     if (!Sender->Init("0.0.0.0", 0, Settings.ServerIP, Settings.ServerPort, Settings.BufferSize)) {
-        // TODO: Logs
+        UE_LOG(VoiceChatLog, Error, TEXT("VoiceChat Client: Sender not Inited"));
         return false;
     }
 
     Receiver = NewObject<UVC_Receiver>();
+    Receiver->AddToRoot();
     if (!Receiver->Init(FString("0.0.0.0"), Settings.ClientPort, Settings.BufferSize)) {
-        // TODO: Logs
+        UE_LOG(VoiceChatLog, Error, TEXT("VoiceChat Client: Receiver not Inited"));
         return false;
     }
     Receiver->UDPReceiver->OnDataReceived().BindUObject(this, &AVC_Client::UDPReceive);
     Receiver->UDPReceiver->Start();
 
     ChannelAssigner = NewObject<UVC_ChannelAssigner>();
+    ChannelAssigner->AddToRoot();
     if (ChannelAssigner == nullptr) {
-        //TODO: log
+        UE_LOG(VoiceChatLog, Error, TEXT("VoiceChat Client: Channel Assigner not Inited"));
         return false;
     }
 
+    UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Client: Inited"));
     InitStatus = true;
 	return InitStatus;
 };
@@ -69,28 +76,34 @@ void AVC_Client::Deinit() {
 
     if (MicrophoneManager != nullptr) {
         MicrophoneManager->Deinit();
+        delete MicrophoneManager;
     }
 
     if (AudioManager != nullptr) {
         AudioManager->DeleteAllChannels();
+        delete AudioManager;
     }
 
     if (Receiver != nullptr) {
         Receiver->Deinit();
+        delete Receiver;
     }
 
     if (Sender != nullptr) {
         Sender->Deinit();
+        delete Sender;
     }
 
     if (ChannelAssigner != nullptr) {
         delete ChannelAssigner;
     }
+
+    UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Client: Deinited"));
 };
 
 bool AVC_Client::UDPSend(FVC_Packet Packet) {
 	if (InitStatus == false) {
-		UE_LOG(VoiceChatLog, Error, TEXT("Voice Client is not Initialized (UDPSend)"));
+		UE_LOG(VoiceChatLog, Error, TEXT("VoiceChat Client: Not Inited (UDPSend)"));
 		return false;
 	}
 		
@@ -98,7 +111,7 @@ bool AVC_Client::UDPSend(FVC_Packet Packet) {
 	Writer << Packet;
 
 	if (!Sender->SendPacket(Packet)) {
-        UE_LOG(VoiceChatLog, Error, TEXT("Send Error (Client UDPSend)"));
+        UE_LOG(VoiceChatLog, Error, TEXT("VoiceChat Client: Send Packet Error"));
 		return false;
     }
 
@@ -122,7 +135,9 @@ void AVC_Client::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 
     if (CanPacketBeSet(Packet)) {
         if (ChannelAssigner->GetChannel() == Packet.Channel) {
-            //AudioManager->SetData(Packet.VoiceData, 0);
+            if (bAllowPlayBackLocal == false && bAllowPlayBackServer == true) {
+                AudioManager->SetData(Packet.VoiceData, 0);
+            }
             return;
         }
 
@@ -133,8 +148,6 @@ void AVC_Client::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 
 void AVC_Client::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	Super::EndPlay(EndPlayReason);
-
-	Deinit();
 };
 
 void AVC_Client::Tick(float DeltaTime) {
@@ -144,15 +157,24 @@ void AVC_Client::Tick(float DeltaTime) {
 		return;
 	}
 
+    if (bAllowPlayBackLocal == true) {
+        bool isValid = false;
+        auto Data = MicrophoneManager->GetVoiceBuffer(isValid);
+        if (isValid == false) {
+            return;
+        }
+        AudioManager->SetData(Data, 0);
+        return;
+    }
+
     if (ChannelAssigner->GetStatus() != VC_ConnectionProtocolStagesClient::CHANNEL_ASSIGN) {
         if (ChannelAssigner->GetStatus() == VC_ConnectionProtocolStagesClient::SEND_REQUEST) {
             FVC_Packet NewPacket = ChannelAssigner->GetRequestPacket();
             Sender->SendPacket(NewPacket);
-            //todo: logs
+            UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Client: Channel Request Sended"));
         } else if (ChannelAssigner->GetStatus() == VC_ConnectionProtocolStagesClient::AWAIT_CHANNEL) {
             ChannelAssigner->UpdateStatus();
         }
-
         return;
     } 
 
@@ -161,10 +183,6 @@ void AVC_Client::Tick(float DeltaTime) {
     if (isValid == false) {
         return;
     }
-
-    // if (bAllowPlayBack == true) {
-    //     AudioManager->SetData(Data, 0);
-    // }
 
     FVC_Packet NewPacket(GetVoiceMeta(), Data);
     NewPacket.Channel = ChannelAssigner->GetChannel();
@@ -186,11 +204,9 @@ FString AVC_Client::GetVoiceMeta_Implementation() const {
 
 void AVC_Client::SetMicrophoneThreshold(float NewThreshold) {
     if (InitStatus == false) {
-        //TODO : Log
+        UE_LOG(VoiceChatLog, Error, TEXT("VoiceChat Client: Not Inited (SetMicrophoneThreshold)"));
         return;
     }
 
     MicrophoneManager->SetMicThreshold(NewThreshold);
 };
-
-#pragma optimize("", on)

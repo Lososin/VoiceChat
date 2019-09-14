@@ -4,6 +4,10 @@ AVC_Server::AVC_Server() {
 	PrimaryActorTick.bCanEverTick = true;
 };
 
+AVC_Server::~AVC_Server() {
+
+};
+
 void AVC_Server::SetSettings(FVC_Settings _Settings) {
 	Settings = _Settings;
 };
@@ -16,25 +20,29 @@ bool AVC_Server::Init() {
 	Deinit();
 
 	Receiver = NewObject<UVC_Receiver>();
+	Receiver->AddToRoot();
     if (!Receiver->Init(FString("0.0.0.0"), Settings.ServerPort, Settings.BufferSize)) {
-        // TODO: Logs
+        UE_LOG(VoiceChatLog, Error, TEXT("VoiceChat Server: Receiver not Created"));
         return false;
     }
     Receiver->UDPReceiver->OnDataReceived().BindUObject(this, &AVC_Server::UDPReceive);
 	Receiver->UDPReceiver->Start();
 
 	SendersManager = NewObject<UVC_SendersManager>();
+	SendersManager->AddToRoot();
 	if (SendersManager == nullptr) {
-		// TODO: logs
+		UE_LOG(VoiceChatLog, Error, TEXT("VoiceChat Server: Senders Mannager not Created"));
 		return false;
 	}
 
 	VoiceBroadcast = NewObject<UVC_VoiceBroadcast>();
+	VoiceBroadcast->AddToRoot();
 	if (VoiceBroadcast == nullptr) {
-		// TODO: Logs
+		UE_LOG(VoiceChatLog, Error, TEXT("VoiceChat Server: Voice Broadcast not Created"));
 		return false;
 	}
 
+	UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Server: Inited"));
 	InitStatus = true;
 	return InitStatus;
 };
@@ -44,11 +52,14 @@ void AVC_Server::Deinit() {
 
 	if (Receiver != nullptr) {
         Receiver->Deinit();
+		delete Receiver;
     }
-	//todo: memory fix
-	// if (VoiceBroadcast != nullptr) {
-	// 	delete VoiceBroadcast;
-	// }
+
+	if (VoiceBroadcast != nullptr) {
+		delete VoiceBroadcast;
+	}
+
+	UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Server: Deinited"));
 };
 
 void AVC_Server::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt) {
@@ -67,7 +78,7 @@ void AVC_Server::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 		int NewChannel = AllChannels;
 		AllChannels++;
 		if (!SendersManager->CreateNewSender(ClientInfo, Settings, NewChannel)) {
-			//todo: logs
+			UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Server: Assigned New Channel=%d"), NewChannel);
 			return;
 		}
 		Packet.Channel = NewChannel;
@@ -80,8 +91,6 @@ void AVC_Server::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 
 void AVC_Server::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	Super::EndPlay(EndPlayReason);
-
-	Deinit();
 };
 
 void AVC_Server::Tick(float DeltaTime) {

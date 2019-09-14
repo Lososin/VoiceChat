@@ -27,14 +27,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|BaseClasses|Sender")
 	bool IsInited() const;
 
-    //void UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt);
-
     // TODO: Think about callback (mb queu)
     FUdpSocketReceiver* UDPReceiver;
 private:
     UReceiver_Callback* Callback;
 
     FSocket* ListenerSocket;
-    //FUdpSocketReceiver* UDPReceiver;
 	bool InitStatus;
 };

@@ -10,10 +10,10 @@ UVC_AudioTrack::~UVC_AudioTrack() {
 
 bool UVC_AudioTrack::Init(const UObject* WorldContextObject, int SampleRate, int NewChannel, float Volume) {
 	Deinit();
-	// TODO: Log wron context
+
 	AudioStream = NewObject<USoundWaveProcedural>();
 	if (AudioStream == nullptr) {
-		UE_LOG(VoiceChatLog, Error, TEXT("AudioTrack doesn't Initialize"));
+		UE_LOG(VoiceChatLog, Error, TEXT("AudioTrack: Audio Stream not Created"));
 		return false;
 	}
 
@@ -24,12 +24,12 @@ bool UVC_AudioTrack::Init(const UObject* WorldContextObject, int SampleRate, int
 	Channel = NewChannel;
 
 	SoundStream = UGameplayStatics::SpawnSound2D(WorldContextObject, AudioStream, Volume);
-
 	if (SoundStream == nullptr) {
-		UE_LOG(VoiceChatLog, Error, TEXT("AudioTrack doesn't Initialize"));
+		UE_LOG(VoiceChatLog, Error, TEXT("AudioTrack: Sound Stream 2D not Created"));
 		return false;
 	}
 
+	UE_LOG(VoiceChatLog, Log, TEXT("AudioTrack: Inited"));
 	InitStatus = true;
 	return InitStatus;
 };
@@ -37,15 +37,16 @@ bool UVC_AudioTrack::Init(const UObject* WorldContextObject, int SampleRate, int
 void UVC_AudioTrack::Deinit() {
 	InitStatus = false;
 
-	// TODO: Memory fix
-	// if (SoundStream != nullptr) {
-	// 	SoundStream->Stop();
-	// 	//delete SoundStream;
-	// }
+	if (SoundStream != nullptr) {
+		SoundStream->Stop();
+		delete SoundStream;
+	}
 
-	// if (AudioStream != nullptr) {
-	// 	delete AudioStream;
-	// }
+	if (AudioStream != nullptr) {
+		delete AudioStream;
+	}
+
+	UE_LOG(VoiceChatLog, Log, TEXT("AudioTrack: Deinited"));
 };
 
 bool UVC_AudioTrack::IsInit() const {
@@ -58,7 +59,7 @@ int UVC_AudioTrack::GetChannelNumber() const {
 
 bool UVC_AudioTrack::AddWaveData(TArray<uint8> AudioData) {
 	if (InitStatus == false) {
-		UE_LOG(VoiceChatLog, Error, TEXT("Can't set Wave Data (AudioTrack wasn't initialize)"));
+		UE_LOG(VoiceChatLog, Error, TEXT("AudioTrack: Not Inited (AddWaveData)"));
 		return false;
 	}
 
@@ -68,5 +69,10 @@ bool UVC_AudioTrack::AddWaveData(TArray<uint8> AudioData) {
 };
 
 void UVC_AudioTrack::SetVolume(float Volume = 1.f) {
+	if (InitStatus == false) {
+		UE_LOG(VoiceChatLog, Error, TEXT("AudioTrack: Not Inited (SetVolume)"));
+		return;
+	}
+
 	SoundStream->AdjustVolume(1.f, Volume);
 };

@@ -18,6 +18,7 @@ class AVC_Client : public AActor {
 
 public:
 	AVC_Client();
+	~AVC_Client();
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Client")
 	void SetSettings(FVC_Settings _Settings);
@@ -51,7 +52,10 @@ public:
 	FString GetVoiceMeta() const;
 
 	UPROPERTY(BlueprintReadWrite)
-	bool bAllowPlayBack = true;
+	bool bAllowPlayBackLocal = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bAllowPlayBackServer = false;
 
 protected:
 	virtual void BeginPlay() override;
@@ -59,7 +63,6 @@ protected:
 	void UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt);
 
 private:
-	TArray<UAudioComponent*> SoundWaves;
 
 	UVC_MicrophoneManager* MicrophoneManager;
 	UVC_AudioManager* AudioManager;

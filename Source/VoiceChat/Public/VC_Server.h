@@ -14,6 +14,7 @@ class AVC_Server : public AActor {
 
 public:
 	AVC_Server();
+	~AVC_Server();
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChat,Initialization")
 	void SetSettings(FVC_Settings _Settings);
@@ -46,6 +47,5 @@ private:
 	bool InitStatus;
 
 	// TODO: to Constructor
-	// TODO: Mutex
 	int AllChannels = 1;
 };

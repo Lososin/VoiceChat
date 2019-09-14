@@ -1,23 +1,30 @@
 #include "VC_AudioManager.h"
-#pragma optimize("", off)
+
 UVC_AudioManager::UVC_AudioManager() {
 
 };
 
+UVC_AudioManager::~UVC_AudioManager() {
+    DeleteAllChannels();
+}
+
 bool UVC_AudioManager::CreateNewAudio(const UObject* WorldContextObject, int SampleRate, int NewChannel, float Volume) {
     UVC_AudioTrack* NewAudio = NewObject<UVC_AudioTrack>();
-
+    NewAudio->AddToRoot();
+    
     if (NewAudio == nullptr) {
-        // TODO: LOG
+        UE_LOG(VoiceChatLog, Error, TEXT("AudioManager: New Audio Track not Created"));
+        delete NewAudio;
         return false;
     }
 
     if (!NewAudio->Init(WorldContextObject, SampleRate, NewChannel, Volume)) {
-        // TODO: LOG
+        UE_LOG(VoiceChatLog, Error, TEXT("AudioManager: New Audio Track not Inited"));
         return false;
     }
 
     AudioTracks.Add(NewAudio);
+    UE_LOG(VoiceChatLog, Log, TEXT("AudioManager: New Audio Track Created"));
     return true;
 };
 
@@ -29,7 +36,7 @@ void UVC_AudioManager::SetData(TArray<uint8> AudioData, int Channel) {
         }
     }
 
-    // TODO: log this channel didn't find
+    UE_LOG(VoiceChatLog, Warning, TEXT("AudioManager: Audio Channel doesn't exist (SetData)"));
 };
 
 void UVC_AudioManager::SetVolume(float Volume, int Channel) {
@@ -40,11 +47,10 @@ void UVC_AudioManager::SetVolume(float Volume, int Channel) {
         }
     }
 
-    // TODO: log this channel didn't find
+    UE_LOG(VoiceChatLog, Warning, TEXT("AudioManager: Audio Channel doesn't exist (SetVolume)"));
 };
 
 void UVC_AudioManager::DeleteAllChannels() {
     AudioTracks.Empty();
+    UE_LOG(VoiceChatLog, Log, TEXT("AudioManager: All Audio Channels Deleted"));
 };
-
-#pragma optimize("", on)

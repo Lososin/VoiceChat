@@ -11,6 +11,7 @@ class UVC_AudioManager : public UObject {
 
 public:
 	UVC_AudioManager();
+    ~UVC_AudioManager();
 
     UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Managers|AudioManager")
     bool CreateNewAudio(const UObject* WorldContextObject, int SampleRate = 44100, int NewChannel = -1, float Volume = 1.f);
