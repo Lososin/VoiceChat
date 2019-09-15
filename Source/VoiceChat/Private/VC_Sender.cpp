@@ -37,12 +37,16 @@ bool UVC_Sender::Init(FString IpSrc, int PortSrc, FString IpDst, int PortDst, in
 
 	Channel = NewChannel;
 
-	UE_LOG(VoiceChatLog, Log, TEXT("Sender: Inited"));
+	UE_LOG(VoiceChatLog, Log, TEXT("Sender: Inited with SRC=%s:%d, DST=%s:%d, BufferSize=%d, Channel=%d"), *IpSrc, PortSrc, *IpDst, PortDst, BufferSize, NewChannel);
 	InitStatus = true;
 	return InitStatus;
 };
 
 void UVC_Sender::Deinit() {
+	if (InitStatus == false) {
+		return;
+	}
+
 	InitStatus = false;
 	Channel = -1;
 

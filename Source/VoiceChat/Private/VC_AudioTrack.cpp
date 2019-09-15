@@ -29,12 +29,16 @@ bool UVC_AudioTrack::Init(const UObject* WorldContextObject, int SampleRate, int
 		return false;
 	}
 
-	UE_LOG(VoiceChatLog, Log, TEXT("AudioTrack: Inited"));
+	UE_LOG(VoiceChatLog, Log, TEXT("AudioTrack: Inited with Channel=%d, SampleRate=%d, Volume=%f"), NewChannel, SampleRate, Volume);
 	InitStatus = true;
 	return InitStatus;
 };
 
 void UVC_AudioTrack::Deinit() {
+	if (InitStatus == false) {
+		return;
+	}
+
 	InitStatus = false;
 
 	if (SoundStream != nullptr) {

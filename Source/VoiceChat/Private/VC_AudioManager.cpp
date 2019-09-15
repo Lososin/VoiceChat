@@ -24,7 +24,7 @@ bool UVC_AudioManager::CreateNewAudio(const UObject* WorldContextObject, int Sam
     }
 
     AudioTracks.Add(NewAudio);
-    UE_LOG(VoiceChatLog, Log, TEXT("AudioManager: New Audio Track Created"));
+    UE_LOG(VoiceChatLog, Log, TEXT("AudioManager: New Audio Track Created, All tracks are %d"), AudioTracks.Num());
     return true;
 };
 
@@ -32,11 +32,11 @@ void UVC_AudioManager::SetData(TArray<uint8> AudioData, int Channel) {
     for (auto& a : AudioTracks) {
         if (a->GetChannelNumber() == Channel) {
             a->AddWaveData(AudioData);
-            break;
+            return;
         }
     }
 
-    UE_LOG(VoiceChatLog, Warning, TEXT("AudioManager: Audio Channel doesn't exist (SetData)"));
+    UE_LOG(VoiceChatLog, Warning, TEXT("AudioManager: Audio Channel %d doesn't exist (SetData)"), Channel);
 };
 
 void UVC_AudioManager::SetVolume(float Volume, int Channel) {

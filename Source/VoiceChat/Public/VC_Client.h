@@ -70,7 +70,7 @@ private:
 	UVC_Receiver* Receiver;
 
 	UVC_ChannelAssigner* ChannelAssigner;
-
+	
 	FVC_Settings Settings;
 	bool InitStatus = false;
 };

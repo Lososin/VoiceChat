@@ -72,6 +72,10 @@ bool AVC_Client::Init() {
 };
 
 void AVC_Client::Deinit() {
+    if (InitStatus == false) {
+		return;
+	}
+
     InitStatus = false;
 
     if (MicrophoneManager != nullptr) {
@@ -128,8 +132,8 @@ void AVC_Client::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 
 	BPEvent_UDPReceive(Packet);
 
-    if (Packet.Meta == "CHANNELASSIGN") {
-        ChannelAssigner->SetChannel(Packet.Channel);
+    if (Packet.Meta == "CHANNELASSIGN" && ChannelAssigner->GetStatus() == VC_ConnectionProtocolStagesClient::AWAIT_CHANNEL) {
+        ChannelAssigner->SetChannel(Packet);
         return;
     }
 

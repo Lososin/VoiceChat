@@ -35,7 +35,7 @@ bool UVC_MicrophoneManager::Init(int SampleRate) {
 
 	VoiceCapture->Start();
 
-	UE_LOG(VoiceChatLog, Log, TEXT("Microphone Module: Inited"));
+	UE_LOG(VoiceChatLog, Log, TEXT("Microphone Module: Inited with SampleRate=%d"), SampleRate);
 	InitStatus = true;
 	return InitStatus;
 };
@@ -74,6 +74,10 @@ bool UVC_MicrophoneManager::IsInited() const {
 };
 
 void UVC_MicrophoneManager::Deinit() {
+	if (InitStatus == false) {
+		return;
+	}
+
 	InitStatus = false;
 	if (VoiceCapture.IsValid()) {
 		VoiceCapture->Stop();

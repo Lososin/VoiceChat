@@ -48,6 +48,10 @@ bool AVC_Server::Init() {
 };
 
 void AVC_Server::Deinit() {
+	if (InitStatus == false) {
+		return;
+	}
+
 	InitStatus = false;
 
 	if (Receiver != nullptr) {
@@ -80,7 +84,7 @@ void AVC_Server::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 		if (!SendersManager->CreateNewSender(ClientInfo, Settings, NewChannel)) {
 			return;
 		}
-		UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Server: Assigned New Channel=%d"), NewChannel);
+		UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Server: Assigned New Channel=%d, with UniqueID=%d (Address=%s:%d)"), NewChannel, Packet.UniqueID, *EndPt.Address.ToString(), EndPt.Port);
 		Packet.Channel = NewChannel;
 		SendersManager->SendData(Packet, NewChannel);
 		return;

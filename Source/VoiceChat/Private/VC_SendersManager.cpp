@@ -9,7 +9,7 @@ UVC_SendersManager::~UVC_SendersManager() {
 };
 
 bool UVC_SendersManager::CreateNewSender(FVC_Address ClientSrcAddress, FVC_Settings Settings, int ChannelNumber) {
-    TUniquePtr<UVC_Sender> NewSender(NewObject<UVC_Sender>());
+    UVC_Sender* NewSender = NewObject<UVC_Sender>();
     NewSender->AddToRoot();
     //TODO: Check if already exist
 	if (!NewSender->Init(ClientSrcAddress.IP, ClientSrcAddress.Port, ClientSrcAddress.IP, Settings.ClientPort, Settings.BufferSize, ChannelNumber)) {
@@ -17,10 +17,9 @@ bool UVC_SendersManager::CreateNewSender(FVC_Address ClientSrcAddress, FVC_Setti
         return false;
     }
 
-    Senders.Add(std::move(NewSender));
+    Senders.Add(NewSender);
 
-    UE_LOG(VoiceChatLog, Log, TEXT("Senders Manager: NewSender Created"));
-    UE_LOG(VoiceChatLog, Log, TEXT("Senders Manager: All Senders is %d"), Senders.Num());
+    UE_LOG(VoiceChatLog, Log, TEXT("Senders Manager: NewSender Created, All Senders are %d"), Senders.Num());
 	return true;
 };
 

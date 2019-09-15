@@ -32,5 +32,5 @@ public:
 
 	// TODO: delete channel feature
 private: 
-	TArray<TUniquePtr<UVC_Sender>> Senders;
+	TArray<UVC_Sender*> Senders;
 };

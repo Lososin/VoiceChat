@@ -32,20 +32,22 @@ bool UVC_Receiver::Init(FString Ip, int Port, int BufferSize) {
         return false;
     }
 
-    UE_LOG(VoiceChatLog, Log, TEXT("Receiver: Inited"));
+    UE_LOG(VoiceChatLog, Log, TEXT("Receiver: Inited with Address=%s:%d, BufferSize=%d"), *Ip, Port, BufferSize);
     InitStatus = true;
 	return InitStatus;
 };
 
 void UVC_Receiver::Deinit() {
-    if (InitStatus == true) {
-        UDPReceiver->Stop();
-        ListenerSocket->Close();
-        delete UDPReceiver;
-        delete ListenerSocket;
-        InitStatus = false;
-    }
+    if (InitStatus == false) {
+		return;
+	}
 
+    InitStatus = false;
+    UDPReceiver->Stop();
+    ListenerSocket->Close();
+    delete UDPReceiver;
+    delete ListenerSocket;
+        
     UE_LOG(VoiceChatLog, Log, TEXT("Receiver: Deinited"));
 };
 

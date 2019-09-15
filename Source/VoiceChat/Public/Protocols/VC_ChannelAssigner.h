@@ -4,6 +4,7 @@
 #include "VC_Address.h"
 #include "VC_Sender.h"
 #include "VC_Packet.h"
+#include "Math/UnrealMathUtility.h"
 #include "VC_ChannelAssigner.generated.h"
 
 UENUM(Blueprintable)
@@ -34,7 +35,7 @@ public:
 	VC_ConnectionProtocolStagesClient GetStatus() const;
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Protocols|ChannelAssigner")
-	void SetChannel(int NewChannel);
+	void SetChannel(FVC_Packet Packet);
 
 	UFUNCTION(BlueprintCallable, Category = "VoiceChatPlugin|Protocols|ChannelAssigner")
 	void UpdateStatus();
@@ -42,6 +43,6 @@ public:
 private:
 	VC_ConnectionProtocolStagesClient CurrentStage = VC_ConnectionProtocolStagesClient::SEND_REQUEST;
 	int Channel = -1;
-
+	int UniqueID;
 	int FramesToWait;
 };
