@@ -79,12 +79,17 @@ void AVC_Server::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 	BPEvent_UDPReceive(Packet, ClientInfo);
 
 	if (Packet.Meta == FString("CHANNELASSIGN")) {
-		int NewChannel = AllChannels;
-		AllChannels++;
-		if (!SendersManager->CreateNewSender(ClientInfo, Settings, NewChannel)) {
-			return;
+		int NewChannel = SendersManager->GetChannelNumber(ClientInfo);
+		if (NewChannel == -1) {
+			NewChannel = AllChannels;
+			AllChannels++;
+			if (!SendersManager->CreateNewSender(ClientInfo, Settings, NewChannel)) {
+				return;
+			}
+			UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Server: Assigned New Channel=%d, with UniqueID=%d (Address=%s:%d)"), NewChannel, Packet.UniqueID, *EndPt.Address.ToString(), EndPt.Port);
+		} else {
+			UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Server: Already Exist. Returned Again Channel=%d, with UniqueID=%d (Address=%s:%d)"), NewChannel, Packet.UniqueID, *EndPt.Address.ToString(), EndPt.Port);
 		}
-		UE_LOG(VoiceChatLog, Log, TEXT("VoiceChat Server: Assigned New Channel=%d, with UniqueID=%d (Address=%s:%d)"), NewChannel, Packet.UniqueID, *EndPt.Address.ToString(), EndPt.Port);
 		Packet.Channel = NewChannel;
 		SendersManager->SendData(Packet, NewChannel);
 		return;

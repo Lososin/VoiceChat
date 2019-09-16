@@ -16,7 +16,7 @@ int UVC_ChannelAssigner::GetChannel() const {
 
 FVC_Packet UVC_ChannelAssigner::GetRequestPacket() {
     CurrentStage = VC_ConnectionProtocolStagesClient::AWAIT_CHANNEL;
-    FramesToWait = 100;
+    FramesToWait = 1000;
     UE_LOG(VoiceChatLog, Log, TEXT("ChannelAssigner: Current Status is AWAIT_CHANNEL"));
     return FVC_Packet(FString("CHANNELASSIGN"), TArray<uint8>(), UniqueID);
 };

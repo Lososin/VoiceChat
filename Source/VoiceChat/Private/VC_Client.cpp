@@ -132,6 +132,10 @@ void AVC_Client::UDPReceive(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4En
 
 	BPEvent_UDPReceive(Packet);
 
+    if (Packet.Meta == "CHANNELASSIGN") {
+        GEngine->AddOnScreenDebugMessage(0, 10.f, FColor::Red, FString::Printf(TEXT("CHANNEL ASSIGN RECEIVED")));
+    }
+
     if (Packet.Meta == "CHANNELASSIGN" && ChannelAssigner->GetStatus() == VC_ConnectionProtocolStagesClient::AWAIT_CHANNEL) {
         ChannelAssigner->SetChannel(Packet);
         return;
@@ -213,4 +217,5 @@ void AVC_Client::SetMicrophoneThreshold(float NewThreshold) {
     }
 
     MicrophoneManager->SetMicThreshold(NewThreshold);
+    //UE_LOG(VoiceChatLog, Error, TEXT("VoiceChat Client: Not Inited (SetMicrophoneThreshold)"));
 };

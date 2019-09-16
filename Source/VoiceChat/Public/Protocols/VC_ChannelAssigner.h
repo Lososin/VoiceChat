@@ -5,6 +5,7 @@
 #include "VC_Sender.h"
 #include "VC_Packet.h"
 #include "Math/UnrealMathUtility.h"
+#include "VoiceChat.h"
 #include "VC_ChannelAssigner.generated.h"
 
 UENUM(Blueprintable)

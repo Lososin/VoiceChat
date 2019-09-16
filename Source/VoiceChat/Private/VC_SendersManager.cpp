@@ -5,7 +5,7 @@ UVC_SendersManager::UVC_SendersManager() {
 };
 
 UVC_SendersManager::~UVC_SendersManager() {
-
+    DeleteAllChannels();
 };
 
 bool UVC_SendersManager::CreateNewSender(FVC_Address ClientSrcAddress, FVC_Settings Settings, int ChannelNumber) {
@@ -26,8 +26,7 @@ bool UVC_SendersManager::CreateNewSender(FVC_Address ClientSrcAddress, FVC_Setti
 int UVC_SendersManager::GetChannelNumber(FVC_Address SourceInfo) const {
     // Find channel
     for (auto& a : Senders) {
-        if (a->GetSourceInfo().IP == SourceInfo.IP &&
-                a->GetSourceInfo().Port == SourceInfo.Port) {
+        if (a->GetSourceInfo().IP == SourceInfo.IP) {
             return a->GetChannelNumber();
         }
     }
@@ -58,6 +57,8 @@ TArray<int> UVC_SendersManager::GetChannelsArray() const {
 };
 
 void UVC_SendersManager::DeleteAllChannels() {
-    Senders.Empty();
-    UE_LOG(VoiceChatLog, Log, TEXT("Senders Manager: All Senders Deleted"));
+    if (Senders.Num() != 0) {
+        Senders.Empty();
+        UE_LOG(VoiceChatLog, Log, TEXT("Senders Manager: All Senders Deleted"));
+    }
 };

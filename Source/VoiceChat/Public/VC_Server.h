@@ -6,6 +6,7 @@
 #include "VC_Receiver.h"
 #include "VC_VoiceBroadcast.h"
 #include "VC_SendersManager.h"
+#include "VoiceChat.h"
 #include "VC_Server.generated.h"
 
 UCLASS(ClassGroup = VoiceChat, Blueprintable)
